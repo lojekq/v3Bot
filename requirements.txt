@@ -1,0 +1,6 @@
+aiogram==3.13.1
+mysql-connector-python
+cryptography
+asyncio
+babel
+python-dotenv

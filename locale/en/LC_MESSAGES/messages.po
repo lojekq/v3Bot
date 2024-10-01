@@ -1,0 +1,100 @@
+# English translations for PROJECT.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-10-01 16:54+0500\n"
+"PO-Revision-Date: 2024-10-01 16:54+0500\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+msgid "welcome_back"
+msgstr "Welcome back!"
+
+msgid "choose_language"
+msgstr "Please select your language."
+
+msgid "language_selected"
+msgstr "Language has been successfully selected!"
+
+msgid "start_registration"
+msgstr "Please start registration. What is your gender?"
+
+msgid "enter_nickname"
+msgstr "Please enter your nickname."
+
+msgid "nickname_saved"
+msgstr "The nickname is saved!"
+
+msgid "gender_saved"
+msgstr "Gender saved!"
+
+msgid "choose_orientation"
+msgstr "Now choose your orientation."
+
+msgid "invalid_orientation"
+msgstr "Invalid orientation. Please choose one of the available options."
+
+msgid "gender_male"
+msgstr "Male"
+
+msgid "gender_female"
+msgstr "Female"
+
+msgid "gender_other"
+msgstr "Other"
+
+msgid "orientation_heterosexual"
+msgstr "Heterosexual"
+
+msgid "orientation_homosexual"
+msgstr "Homosexual"
+
+msgid "orientation_bisexual"
+msgstr "Bisexual"
+
+msgid "orientation_pansexual"
+msgstr "Pansexual"
+
+msgid "orientation_asexual"
+msgstr "Asexual"
+
+msgid "orientation_lesbian"
+msgstr "Lesbian"
+
+msgid "orientation_heterosexual_female"
+msgstr "Heterosexual Female"
+
+msgid "orientation_bisexual_female"
+msgstr "Bisexual Female"
+
+msgid "orientation_pansexual_female"
+msgstr "Pansexual Female"
+
+msgid "orientation_saved"
+msgstr "Orientation saved!"
+
+msgid "choose_interests"
+msgstr "Please provide your interests."
+
+msgid "interests_saved"
+msgstr "Interests saved!"
+
+msgid "choose_location"
+msgstr "Please provide your location."
+
+msgid "enter_custom_gender"
+msgstr "Please enter your gender."
+
+msgid "custom_gender_saved"
+msgstr "Your gender has been saved!"

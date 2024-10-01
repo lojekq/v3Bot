@@ -1,0 +1,100 @@
+# Kazakh translations for PROJECT.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-10-01 16:54+0500\n"
+"PO-Revision-Date: 2024-10-01 16:54+0500\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: kk\n"
+"Language-Team: kk <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+msgid "welcome_back"
+msgstr "Қош келдіңіз!"
+
+msgid "choose_language"
+msgstr "Тілді таңдаңыз."
+
+msgid "language_selected"
+msgstr "Тіл сәтті таңдалды!"
+
+msgid "start_registration"
+msgstr "Тіркелуді бастаңыз."
+
+msgid "enter_nickname"
+msgstr "Лақап атыңызды енгізіңіз."
+
+msgid "nickname_saved"
+msgstr "Лақап аты сақталды!"
+
+msgid "gender_saved"
+msgstr "Жыныс сақталды!"
+
+msgid "choose_orientation"
+msgstr "Бағытыңызды таңдаңыз."
+
+msgid "invalid_orientation"
+msgstr "Қате бағыт. Ұсынылған нұсқалардың бірін таңдаңыз."
+
+msgid "gender_male"
+msgstr "Ер адам"
+
+msgid "gender_female"
+msgstr "Әйел"
+
+msgid "gender_other"
+msgstr "Басқа"
+
+msgid "orientation_heterosexual"
+msgstr "Гетеросексуал"
+
+msgid "orientation_homosexual"
+msgstr "Гомосексуал"
+
+msgid "orientation_bisexual"
+msgstr "Бисексуал"
+
+msgid "orientation_pansexual"
+msgstr "Пансексуал"
+
+msgid "orientation_asexual"
+msgstr "Асексул"
+
+msgid "orientation_lesbian"
+msgstr "Лесбиянка"
+
+msgid "orientation_heterosexual_female"
+msgstr "Гетеросексуалка"
+
+msgid "orientation_bisexual_female"
+msgstr "Бисексуалка"
+
+msgid "orientation_pansexual_female"
+msgstr "Пансексуалка"
+
+msgid "orientation_saved"
+msgstr "Бағдар сақталды!"
+
+msgid "choose_interests"
+msgstr "Қызығушылықтарыңызды көрсетіңіз."
+
+msgid "interests_saved"
+msgstr "Қызығушылықтар сақталды!"
+
+msgid "choose_location"
+msgstr "Орналасқан жеріңізді көрсетіңіз."
+
+msgid "enter_custom_gender"
+msgstr "Өз жынысыңызды енгізіңіз."
+
+msgid "custom_gender_saved"
+msgstr "Жынысыңыз сақталды!"
