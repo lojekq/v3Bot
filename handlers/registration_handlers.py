@@ -84,101 +84,118 @@ INTERESTS_MAP = {
     "Movies": {"en": "Movies", "ru": "Фильмы", "kz": "Фильмдер"}
 }
 
-# Функция для сохранения фото
+# Функция для сохранения и удаления сообщений
+async def safe_send_message(message, text, state, reply_markup=None):
+    msg = await message.answer(text, reply_markup=reply_markup)
+    data = await state.get_data()
+    bot_messages = data.get('bot_messages', [])
+    bot_messages.append(msg.message_id)
+    await state.update_data(bot_messages=bot_messages)
+
+async def safe_send_user_message(message, state):
+    data = await state.get_data()
+    user_messages = data.get('user_messages', [])
+    user_messages.append(message.message_id)
+    await state.update_data(user_messages=user_messages)
+
+async def delete_registration_messages(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    bot_messages = data.get('bot_messages', [])
+    user_messages = data.get('user_messages', [])
+
+    for message_id in bot_messages:
+        try:
+            await message.bot.delete_message(chat_id=message.chat.id, message_id=message_id)
+        except Exception as e:
+            logging.error(f"Ошибка при удалении сообщения бота: {e}")
+
+    for message_id in user_messages:
+        try:
+            await message.bot.delete_message(chat_id=message.chat.id, message_id=message_id)
+        except Exception as e:
+            logging.error(f"Ошибка при удалении сообщения пользователя: {e}")
+
+    await state.update_data(bot_messages=[], user_messages=[])
+
+# Функция для сохранения фото профиля
 async def save_profile_photo(bot: Bot, photo: types.PhotoSize, user_id: int):
-    # Получаем информацию о файле с помощью API Telegram
     file_info = await bot.get_file(photo.file_id)
     file_extension = file_info.file_path.split('.')[-1]
     file_name = f"{user_id}.{file_extension}"
-
-    # Путь для сохранения фотографии
     photo_path = os.path.join(PHOTO_PATH, file_name)
-
-    # Сохраняем файл локально
     await bot.download_file(file_info.file_path, photo_path)
-
-    # Возвращаем путь к фото
     return photo_path
 
+# Функция для сохранения видео или GIF
+async def save_profile_video_or_gif(bot: Bot, media: types.Video | types.Animation, user_id: int, media_type: str):
+    file_info = await bot.get_file(media.file_id)
+    file_extension = 'mp4' if media_type == 'video' else 'gif'
+    file_name = f"{user_id}.{file_extension}"
+    media_path = os.path.join(PHOTO_PATH, file_name)
+    await bot.download_file(file_info.file_path, media_path)
+    return media_path
 
+# Начало регистрации
 async def start_registration(message: types.Message, state: FSMContext, bot: Bot):
-    # Начало процесса регистрации
     await create_user(message.from_user.id, message.from_user.username)
-    # Задаем язык по умолчанию на первом шаге (например, английский)
     lang_code = 'en'
-    
-    # Отправляем сообщение с выбором языка
-    await message.answer(translate('choose_language', lang_code), reply_markup=set_language())
-    
-    # Переходим к выбору языка
+    await safe_send_message(message, translate('choose_language', lang_code), state, reply_markup=set_language())
     await state.set_state(Registration.language)
 
-# Обработка выбора языка
+# Выбор языка
 @registration_router.message(StateFilter(Registration.language))
 async def set_user_language(message: types.Message, state: FSMContext, bot: Bot):
+    await safe_send_user_message(message, state)
+    
     language_map = {
         "English": "en",
         "Русский": "ru",
         "Қазақша": "kz"
     }
     lang_code = language_map.get(message.text, 'en')
-    
-    # Обновляем язык пользователя в базе данных
     await update_user_language(message.from_user.id, lang_code)
-
-    # Переход к следующему шагу регистрации
-    await message.answer(translate('enter_nickname', lang_code), reply_markup=types.ReplyKeyboardRemove())
+    await safe_send_message(message, translate('enter_nickname', lang_code), state, reply_markup=types.ReplyKeyboardRemove())
     await state.set_state(Registration.nickname)
 
 
-# Обработка ввода никнейма
+# Ввод никнейма
 @registration_router.message(StateFilter(Registration.nickname))
 async def set_nickname(message: types.Message, state: FSMContext, bot: Bot):
+    await safe_send_user_message(message, state)
     user = await get_user_by_id(message.from_user.id)
     if user:
         await update_user_nickname(message.from_user.id, message.text)
         lang_code = user['lang']
-
-        # Переход к вводу возраста
-        await message.answer(translate('enter_birth_year', lang_code))
+        await safe_send_message(message, translate('enter_birth_year', lang_code), state)
         await state.set_state(Registration.birth_year)
 
-# Обработка ввода года рождения
+# Ввод года рождения
 @registration_router.message(StateFilter(Registration.birth_year))
 async def set_birth_year(message: types.Message, state: FSMContext):
+    await safe_send_user_message(message, state)
     user = await get_user_by_id(message.from_user.id)
     if user:
         lang_code = user['lang']
-
-        # Проверяем, что пользователь ввел только цифры
         if not message.text.isdigit():
-            await message.answer(translate('invalid_birth_year', lang_code))
+            await safe_send_message(message, translate('invalid_birth_year', lang_code), state)
             return
 
-        # Преобразуем ввод в целое число
         birth_year = int(message.text)
         current_year = datetime.now().year
-
-        # Проверка возраста и корректности года
         age = current_year - birth_year
         if age < 19:
-            # Если пользователю меньше 19 лет, мы его блокируем до достижения 19 лет
-            ban_duration = 19 - age  # Количество лет до достижения 19
+            ban_duration = 19 - age
             unban_year = current_year + ban_duration
             await update_user_ban_until(message.from_user.id, unban_year)
-            await message.answer(translate('underage_ban', lang_code).format(unban_year=unban_year))
+            await safe_send_message(message, translate('underage_ban', lang_code).format(unban_year=unban_year), state)
             return
         elif birth_year > current_year or birth_year < 1990:
-            # Если год рождения указан некорректно
-            await message.answer(translate('invalid_birth_year', lang_code))
+            await safe_send_message(message, translate('invalid_birth_year', lang_code), state)
             return
 
-        # Сохраняем возраст пользователя
         await update_user_age(message.from_user.id, age)
-
-        # Переход к выбору пола
-        await message.answer(translate('age_saved', lang_code))
-        await message.answer(translate('start_registration', lang_code), reply_markup=get_gender_keyboard(lang_code))
+        await safe_send_message(message, translate('age_saved', lang_code), state)
+        await safe_send_message(message, translate('start_registration', lang_code), state, reply_markup=get_gender_keyboard(lang_code))
         await state.set_state(Registration.gender)
 
 # Клавиатура для выбора пола
@@ -191,9 +208,10 @@ def get_gender_keyboard(lang_code):
     markup = types.ReplyKeyboardMarkup(keyboard=gender_buttons, resize_keyboard=True)
     return markup
 
-# Обработка выбора пола
+# Выбор пола
 @registration_router.message(StateFilter(Registration.gender))
 async def set_gender(message: types.Message, state: FSMContext, bot: Bot):
+    await safe_send_user_message(message, state)
     user = await get_user_by_id(message.from_user.id)
     if user:
         lang_code = user['lang']
@@ -203,37 +221,33 @@ async def set_gender(message: types.Message, state: FSMContext, bot: Bot):
             translate('gender_other', lang_code): 'Other'
         }
         gender = gender_map.get(message.text)
-
         if not gender:
-            await message.answer(translate('invalid_gender', lang_code))
+            await safe_send_message(message, translate('invalid_gender', lang_code), state)
             return
 
         if gender == 'Other':
-            # Переход к вводу кастомного гендера
-            await message.answer(translate('enter_custom_gender', lang_code))
+            await safe_send_message(message, translate('enter_custom_gender', lang_code), state)
             await state.set_state(Registration.custom_gender)
         else:
-            # Сохраняем пол и продолжаем регистрацию
             await update_user_gender(message.from_user.id, gender)
-            await message.answer(translate('gender_saved', lang_code), reply_markup=types.ReplyKeyboardRemove())
-            await message.answer(translate('choose_orientation', lang_code), reply_markup=get_orientation_keyboard(gender, lang_code))
+            await safe_send_message(message, translate('gender_saved', lang_code), state, reply_markup=types.ReplyKeyboardRemove())
+            await safe_send_message(message, translate('choose_orientation', lang_code), state, reply_markup=get_orientation_keyboard(gender, lang_code))
             await state.set_state(Registration.orientation)
 
 # Обработка кастомного гендера
 @registration_router.message(StateFilter(Registration.custom_gender))
 async def set_custom_gender(message: types.Message, state: FSMContext, bot: Bot):
+    await safe_send_user_message(message, state)
     user = await get_user_by_id(message.from_user.id)
     if user:
         lang_code = user['lang']
 
-        # Сохраняем кастомный пол и отмечаем его как "Other" для основной логики
         custom_gender = message.text
         await update_user_custom_gender(message.from_user.id, custom_gender)
-        await update_user_gender(message.from_user.id, 'Other')  # Используем "Other" для основной логики
+        await update_user_gender(message.from_user.id, 'Other')
 
-        # Переход к выбору ориентации
-        await message.answer(translate('gender_saved_custom', lang_code).format(custom_gender=custom_gender), reply_markup=types.ReplyKeyboardRemove())
-        await message.answer(translate('choose_orientation', lang_code), reply_markup=get_orientation_keyboard('Other', lang_code))
+        await safe_send_message(message, translate('gender_saved_custom', lang_code).format(custom_gender=custom_gender), state, reply_markup=types.ReplyKeyboardRemove())
+        await safe_send_message(message, translate('choose_orientation', lang_code), state, reply_markup=get_orientation_keyboard('Other', lang_code))
         await state.set_state(Registration.orientation)
 
 # Клавиатура для выбора ориентации
@@ -269,6 +283,7 @@ def get_orientation_keyboard(gender, lang_code):
 # Обработка выбора ориентации
 @registration_router.message(StateFilter(Registration.orientation))
 async def set_orientation(message: types.Message, state: FSMContext, bot: Bot):
+    await safe_send_user_message(message, state)
     user = await get_user_by_id(message.from_user.id)
     if user:
         lang_code = user['lang']
@@ -284,15 +299,12 @@ async def set_orientation(message: types.Message, state: FSMContext, bot: Bot):
         orientation = orientation_map.get(message.text)
 
         if not orientation:
-            await message.answer(translate('invalid_orientation', lang_code))
+            await safe_send_message(message, translate('invalid_orientation', lang_code), state)
             return
 
-        # Сохраняем ориентацию на английском в базу
         await update_user_orientation(message.from_user.id, orientation)
-
-        # Переход к выбору интересов
-        await message.answer(translate('orientation_saved', lang_code), reply_markup=types.ReplyKeyboardRemove())
-        await message.answer(translate('choose_interests', lang_code), reply_markup=get_interests_keyboard(lang_code))
+        await safe_send_message(message, translate('orientation_saved', lang_code), state, reply_markup=types.ReplyKeyboardRemove())
+        await safe_send_message(message, translate('choose_interests', lang_code), state, reply_markup=get_interests_keyboard(lang_code))
         await state.set_state(Registration.interests)
 
 # Клавиатура для выбора интересов с 40 пунктами
@@ -326,47 +338,36 @@ def get_interests_keyboard_with_done(lang_code):
 # Обработка выбора интересов
 @registration_router.message(StateFilter(Registration.interests))
 async def set_interests(message: types.Message, state: FSMContext, bot: Bot):
-    # Получаем текущие интересы пользователя
+    await safe_send_user_message(message, state)
     data = await state.get_data()
     user_interests = data.get('user_interests', [])
-
-    # Получаем язык пользователя
     user = await get_user_by_id(message.from_user.id)
     lang_code = user['lang']
 
-    # Обработка кнопки "Готово" (Done)
     if message.text == translate('done', lang_code):
         if len(user_interests) < 3:
-            await message.answer(translate('interests_minimum', lang_code))
+            await safe_send_message(message, translate('interests_minimum', lang_code), state)
         else:
-            # Преобразуем интересы в английские названия перед сохранением
             english_interests = [INTERESTS_MAP.get(interest, {}).get('en', interest) for interest in user_interests]
-
-            # Сохраняем интересы и переходим к добавлению фото
             await update_user_interests(message.from_user.id, english_interests)
-            await message.answer(translate('registration_completed', lang_code), reply_markup=types.ReplyKeyboardRemove())
-
-            # Переход к выбору добавления фото
-            await message.answer(translate('ask_add_photo', lang_code), reply_markup=get_yes_no_keyboard(lang_code))
+            await safe_send_message(message, translate('registration_completed', lang_code), state, reply_markup=types.ReplyKeyboardRemove())
+            await safe_send_message(message, translate('ask_add_photo', lang_code), state, reply_markup=get_yes_no_keyboard(lang_code))
             await state.set_state(Registration.add_photo_choice)
     else:
-        # Найдем английский эквивалент выбранного интереса
         english_interest = next(
             (interest for interest, translations in INTERESTS_MAP.items() if translations.get(lang_code) == message.text),
             None
         )
 
-        # Добавляем интерес в список, если он не был добавлен ранее
         if english_interest and english_interest not in user_interests:
             user_interests.append(english_interest)
             await state.update_data(user_interests=user_interests)
-            await message.answer(f"{message.text} {translate('interest_added', lang_code)}")
+            await safe_send_message(message, f"{message.text} {translate('interest_added', lang_code)}", state)
 
-        # Если выбрано меньше 3 интересов, не показываем кнопку "Готово"
         if len(user_interests) >= 3:
-            await message.answer(translate('done_button_available', lang_code), reply_markup=get_interests_keyboard_with_done(lang_code))
+            await safe_send_message(message, translate('done_button_available', lang_code), state, reply_markup=get_interests_keyboard_with_done(lang_code))
         else:
-            await message.answer(translate('choose_more_interests', lang_code))
+            await safe_send_message(message, translate('choose_more_interests', lang_code), state)
 
 # Клавиатура с кнопками "Да" и "Нет"
 def get_yes_no_keyboard(lang_code):
@@ -376,49 +377,46 @@ def get_yes_no_keyboard(lang_code):
     ]
     return types.ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
 
-# Обработка ответа на вопрос о добавлении фото
+# Обработка добавления фото
 @registration_router.message(StateFilter(Registration.add_photo_choice))
 async def add_photo_choice(message: types.Message, state: FSMContext, bot: Bot):
+    await safe_send_user_message(message, state)
     user = await get_user_by_id(message.from_user.id)
-    if user:
-        lang_code = user['lang']
+    lang_code = user['lang']
 
-        if message.text == translate('yes', lang_code):
-            # Если пользователь выбрал "Да", просим загрузить фото
-            await message.answer(translate('send_profile_photo', lang_code), reply_markup=types.ReplyKeyboardRemove())
-            await state.set_state(Registration.profile_photo)
-        elif message.text == translate('no', lang_code):
-            # Если пользователь выбрал "Нет", переходим к геолокации
-            await message.answer(translate('share_location_prompt', lang_code), reply_markup=request_location_keyboard(lang_code))
-            await state.set_state(Registration.location)
-        else:
-            await message.answer(translate('invalid_choice', lang_code), reply_markup=get_yes_no_keyboard(lang_code))
+    if message.text == translate('yes', lang_code):
+        await safe_send_message(message, translate('send_profile_photo', lang_code), state, reply_markup=types.ReplyKeyboardRemove())
+        await state.set_state(Registration.profile_photo)
+    elif message.text == translate('no', lang_code):
+        await safe_send_message(message, translate('share_location_prompt', lang_code), state, reply_markup=request_location_keyboard(lang_code))
+        await state.set_state(Registration.location)
+    else:
+        await safe_send_message(message, translate('invalid_choice', lang_code), state, reply_markup=get_yes_no_keyboard(lang_code))
 
-# Обработка загрузки фото, видео и GIF профиля
+# Обработка фото, видео и GIF
 @registration_router.message(StateFilter(Registration.profile_photo), F.photo | F.video | F.animation)
 async def process_profile_media(message: types.Message, state: FSMContext, bot: Bot):
+    await safe_send_user_message(message, state)
     user = await get_user_by_id(message.from_user.id)
     if user:
         lang_code = user['lang']
 
-        # Проверяем, что отправлен фото, видео или GIF
         media = None
         media_type = None
         if message.photo:
-            media = message.photo[-1]  # Получаем наибольшую версию загруженной фотографии
+            media = message.photo[-1]
             media_type = 'photo'
         elif message.video:
-            media = message.video  # Получаем видео
+            media = message.video
             media_type = 'video'
         elif message.animation:
-            media = message.animation  # Получаем GIF
+            media = message.animation
             media_type = 'animation'
 
         if not media:
-            await message.answer(translate('invalid_media', lang_code))
+            await safe_send_message(message, translate('invalid_media', lang_code), state)
             return
 
-        # Сохраняем фото, видео или GIF
         try:
             if media_type == 'photo':
                 file_path = await save_profile_photo(bot, media, message.from_user.id)
@@ -426,14 +424,12 @@ async def process_profile_media(message: types.Message, state: FSMContext, bot: 
                 file_path = await save_profile_video_or_gif(bot, media, message.from_user.id, media_type)
             
             await update_user_photo(message.from_user.id, file_path)
-            await message.answer(translate('media_saved', lang_code), reply_markup=types.ReplyKeyboardRemove())
-
-            # Переход к запросу геолокации
-            await message.answer(translate('share_location_prompt', lang_code), reply_markup=request_location_keyboard(lang_code))
+            await safe_send_message(message, translate('media_saved', lang_code), state, reply_markup=types.ReplyKeyboardRemove())
+            await safe_send_message(message, translate('share_location_prompt', lang_code), state, reply_markup=request_location_keyboard(lang_code))
             await state.set_state(Registration.location)
         except Exception as e:
-            await message.answer(translate('media_save_error', lang_code))
-            print(f"Ошибка при сохранении медиа: {e}")
+            await safe_send_message(message, translate('media_save_error', lang_code), state)
+            logging.error(f"Ошибка при сохранении медиа: {e}")
 
 # Функция для сохранения видео или GIF
 async def save_profile_video_or_gif(bot: Bot, media: types.Video | types.Animation, user_id: int, media_type: str):
@@ -458,9 +454,10 @@ def request_location_keyboard(lang_code):
     ]
     return types.ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
 
-# Обработка отправки геолокации
-@registration_router.message(StateFilter(Registration.location))
+# Обработка отправки локации
+@registration_router.message(StateFilter(Registration.location), F.location)
 async def process_location(message: types.Message, state: FSMContext, bot: Bot):
+    await safe_send_user_message(message, state)  # Сохранение сообщения с локацией
     user = await get_user_by_id(message.from_user.id)
     if user:
         lang_code = user['lang']
@@ -469,16 +466,14 @@ async def process_location(message: types.Message, state: FSMContext, bot: Bot):
             latitude = message.location.latitude
             longitude = message.location.longitude
 
-            # Сохраняем координаты в базе данных
             await update_user_location(message.from_user.id, f"{latitude}, {longitude}")
+            await safe_send_message(message, translate('location_saved', lang_code), state, reply_markup=types.ReplyKeyboardRemove())
 
-            # Сообщение пользователю
-            await message.answer(translate('location_saved', lang_code), reply_markup=types.ReplyKeyboardRemove())
-
-            # Показать профиль после регистрации
-            await message.answer(translate('registration_completed', lang_code), reply_markup=get_show_profile_keyboard(lang_code))
+            # После завершения регистрации и локации показываем профиль и удаляем все сообщения
+            await safe_send_message(message, translate('registration_completed', lang_code), state)
             await show_profile(message, bot)
-            await state.clear()  # Завершение процесса регистрации
+            await delete_registration_messages(message, state)  # Удаление сообщений
+            await state.clear()  # Очистка состояния
         else:
             await message.answer(translate('location_error', lang_code))
 
@@ -494,50 +489,34 @@ def get_show_profile_keyboard(lang_code):
 async def handle_show_profile(message: types.Message, bot: Bot):
     await show_profile(message, bot)
 
-# Показ профиля с учётом языка пользователя
+# Показ профиля
 async def show_profile(message: types.Message, bot: Bot):
     user = await get_user_by_id(message.from_user.id)
-
     if user:
-        # Получаем язык пользователя
         user_lang = await get_user_language(message.from_user.id)
-
-        # Переводим пол и ориентацию с использованием маппингов
         gender_key = GENDER_MAP.get(user.get('gender', 'Other'), 'gender_other')
         gender = translate(gender_key, user_lang)
-
         orientation_key = ORIENTATION_MAP.get(user.get('orientation', 'Heterosexual'), 'orientation_heterosexual')
         orientation = translate(orientation_key, user_lang)
-
         nickname = user.get('username', 'N/A')
-
-        # Получение интересов пользователя из таблицы user_interests
         interests_list = await get_user_interests(message.from_user.id)
 
-        # Проверяем, что interests_list — это список строк, и объединяем их с переводом
         if interests_list:
             interests_str = ', '.join([translate(interest.lower(), user_lang) for interest in interests_list])
         else:
-            interests_str = translate('no_interests', user_lang)  # "Нет интересов" на нужном языке
+            interests_str = translate('no_interests', user_lang)
 
         location = user.get('location', 'N/A')
-
-        # Формируем сообщение профиля с переводом
         profile_info = (
             f"👤 {translate('nickname', user_lang)}: {nickname}\n"
             f"🚻 {translate('gender', user_lang)}: {gender}\n"
             f"🎯 {translate('orientation', user_lang)}: {orientation}\n"
             f"📚 {translate('interests', user_lang)}: {interests_str}\n"
         )
-
-        # Логируем итоговую информацию профиля
         logging.info(f"Generated profile info: {profile_info}")
-
-        # Отправляем медиа (фото, видео или GIF) профиля, если оно есть
         media_path = user.get('profile_photo')
         if media_path:
             try:
-                # Определяем тип медиа по расширению файла
                 input_file = FSInputFile(media_path)
                 if media_path.endswith('.mp4'):
                     await bot.send_video(message.chat.id, input_file, caption=profile_info)
@@ -553,7 +532,3 @@ async def show_profile(message: types.Message, bot: Bot):
     else:
         logging.error(f"User not found with ID: {message.from_user.id}")
         await message.answer("Пользователь не найден. Попробуйте зарегистрироваться заново.")
-
-
-
-
