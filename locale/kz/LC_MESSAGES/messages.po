@@ -1,0 +1,340 @@
+# Kazakh translations for PROJECT.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-10-05 03:30+0500\n"
+"PO-Revision-Date: 2024-10-01 16:54+0500\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: kz\n"
+"Language-Team: kz <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+msgid "welcome_back"
+msgstr "Қош келдіңіз!"
+
+msgid "choose_language"
+msgstr "Тілді таңдаңыз."
+
+msgid "language_selected"
+msgstr "Тіл сәтті таңдалды!"
+
+msgid "start_registration"
+msgstr "Тіркелуді бастаңыз."
+
+msgid "enter_nickname"
+msgstr "Лақап атыңызды енгізіңіз."
+
+msgid "nickname_saved"
+msgstr "Лақап аты сақталды!"
+
+msgid "gender_saved"
+msgstr "Жыныс сақталды!"
+
+msgid "choose_orientation"
+msgstr "Бағытыңызды таңдаңыз."
+
+msgid "invalid_orientation"
+msgstr "Қате бағыт. Ұсынылған нұсқалардың бірін таңдаңыз."
+
+msgid "gender_male"
+msgstr "Ер адам"
+
+msgid "gender_female"
+msgstr "Әйел"
+
+msgid "gender_other"
+msgstr "Басқа"
+
+msgid "orientation_heterosexual"
+msgstr "Гетеросексуал"
+
+msgid "orientation_homosexual"
+msgstr "Гомосексуал"
+
+msgid "orientation_bisexual"
+msgstr "Бисексуал"
+
+msgid "orientation_pansexual"
+msgstr "Пансексуал"
+
+msgid "orientation_asexual"
+msgstr "Асексул"
+
+msgid "orientation_lesbian"
+msgstr "Лесбиянка"
+
+msgid "orientation_heterosexual_female"
+msgstr "Гетеросексуалка"
+
+msgid "orientation_bisexual_female"
+msgstr "Бисексуалка"
+
+msgid "orientation_pansexual_female"
+msgstr "Пансексуалка"
+
+msgid "orientation_saved"
+msgstr "Бағдар сақталды!"
+
+msgid "choose_interests"
+msgstr "Қызығушылықтарыңызды көрсетіңіз."
+
+msgid "interests_saved"
+msgstr "Қызығушылықтар сақталды!"
+
+msgid "choose_location"
+msgstr "Орналасқан жеріңізді көрсетіңіз."
+
+msgid "enter_custom_gender"
+msgstr "Өз жынысыңызды енгізіңіз."
+
+msgid "custom_gender_saved"
+msgstr "Жынысыңыз сақталды!"
+
+msgid "music"
+msgstr "Музыка"
+
+msgid "cinema"
+msgstr "Кино"
+
+msgid "sport"
+msgstr "Спорт"
+
+msgid "technology"
+msgstr "Технология"
+
+msgid "travel"
+msgstr "Саяхат"
+
+msgid "food"
+msgstr "Тағам"
+
+msgid "fashion"
+msgstr "Сән"
+
+msgid "reading"
+msgstr "Оқу"
+
+msgid "programming"
+msgstr "Бағдарламалау"
+
+msgid "games"
+msgstr "Ойындар"
+
+msgid "photography"
+msgstr "Фотосурет"
+
+msgid "dancing"
+msgstr "Би"
+
+msgid "yoga"
+msgstr "Йога"
+
+msgid "meditation"
+msgstr "Медитация"
+
+msgid "cooking"
+msgstr "Аспаздық"
+
+msgid "crossfit"
+msgstr "Кроссфит"
+
+msgid "art"
+msgstr "Өнер"
+
+msgid "drawing"
+msgstr "Сурет салу"
+
+msgid "music_playing"
+msgstr "Музыка (ойнау)"
+
+msgid "singing"
+msgstr "Ән айту"
+
+msgid "psychology"
+msgstr "Психология"
+
+msgid "science"
+msgstr "Ғылым"
+
+msgid "cars"
+msgstr "Көліктер"
+
+msgid "motorcycles"
+msgstr "Мотоциклдер"
+
+msgid "extreme_sports"
+msgstr "Экстремалды спорт"
+
+msgid "outdoor_cooking"
+msgstr "Табиғатта ас дайындау"
+
+msgid "camping"
+msgstr "Кемпинг"
+
+msgid "movies"
+msgstr "Фильмдер"
+
+msgid "done"
+msgstr "Дайын"
+
+msgid "invalid_gender"
+msgstr "Жарамсыз жыныс, берілген нұсқалардың бірін таңдаңыз."
+
+msgid "interest_added"
+msgstr "қызығушылықтарға қосылды"
+
+msgid "interests_minimum"
+msgstr "Кем дегенде 3 қызығушылықты таңдаңыз."
+
+msgid "done_button_available"
+msgstr "Енді таңдауды аяқтай аласыз."
+
+msgid "choose_more_interests"
+msgstr "Қосымша қызығушылықтар таңдаңыз:"
+
+msgid "registration_completed"
+msgstr "Тіркеу аяқталды!"
+
+msgid "share_location"
+msgstr "Өз орныңызбен бөлісіңіз"
+
+msgid "location_saved"
+msgstr "Орныңыз сақталды!"
+
+msgid "location_request"
+msgstr "Тіркеуді жалғастыру үшін орныңызбен бөлісіңіз."
+
+msgid "interests_music"
+msgstr "Музыка"
+
+msgid "interests_movies"
+msgstr "Кино"
+
+msgid "interests_sports"
+msgstr "Спорт"
+
+msgid "interests_technology"
+msgstr "Технологиялар"
+
+msgid "interests_travel"
+msgstr "Саяхат"
+
+msgid "interests_food"
+msgstr "Тамақ"
+
+msgid "interests_fashion"
+msgstr "Мода"
+
+msgid "interests_reading"
+msgstr "Оқу"
+
+msgid "interests_programming"
+msgstr "Бағдарламалау"
+
+msgid "interests_games"
+msgstr "Ойындар"
+
+msgid "interests_photography"
+msgstr "Фотосурет"
+
+msgid "interests_dancing"
+msgstr "Би"
+
+msgid "interests_yoga"
+msgstr "Йога"
+
+msgid "interests_meditation"
+msgstr "Медитация"
+
+msgid "interests_cooking"
+msgstr "Тамақ пісіру"
+
+msgid "interests_crossfit"
+msgstr "Кроссфит"
+
+msgid "interests_art"
+msgstr "Өнер"
+
+msgid "interests_drawing"
+msgstr "Сурет салу"
+
+msgid "interests_music_playing"
+msgstr "Музыка орындау"
+
+msgid "interests_singing"
+msgstr "Ән айту"
+
+msgid "interests_psychology"
+msgstr "Психология"
+
+msgid "interests_science"
+msgstr "Ғылым"
+
+msgid "interests_cars"
+msgstr "Автокөліктер"
+
+msgid "interests_motorcycles"
+msgstr "Мотоциклдер"
+
+msgid "interests_extreme_sports"
+msgstr "Экстремалды спорт"
+
+msgid "interests_outdoor_cooking"
+msgstr "Табиғатта тамақ дайындау"
+
+msgid "interests_camping"
+msgstr "Кемпинг"
+
+msgid "interests_films"
+msgstr "Фильмдер"
+
+msgid "enter_birth_year"
+msgstr "Туған жылыңызды енгізіңіз"
+
+msgid "age_saved"
+msgstr "Жасы сақталды"
+
+msgid "ask_add_photo"
+msgstr "Фото қосқыңыз келе ме?"
+
+msgid "send_profile_photo"
+msgstr "Профиль суретін жіберіңіз"
+
+msgid "invalid_media"
+msgstr "Дұрыс емес медиа форматы"
+
+msgid "share_location_prompt"
+msgstr "Орналасуыңызды жіберіңіз"
+
+msgid "invalid_choice"
+msgstr "Қате таңдау"
+
+msgid "show_profile"
+msgstr "Профильді көрсету"
+
+msgid "nickname"
+msgstr "Лақап аты"
+
+msgid "gender"
+msgstr "Жыныс"
+
+msgid "orientation"
+msgstr "Бағытталу"
+
+msgid "interests"
+msgstr "Қызығушылықтар"
+
+msgid "location"
+msgstr "Орналасу"
+
+msgid "invalid_birth_year"
+msgstr "Қате туған жыл"
+

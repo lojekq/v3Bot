@@ -4,3 +4,5 @@ cryptography
 asyncio
 babel
 python-dotenv
+geopy
+aiomysql

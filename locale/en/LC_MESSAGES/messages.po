@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-10-01 16:54+0500\n"
-"PO-Revision-Date: 2024-10-01 16:54+0500\n"
+"POT-Creation-Date: 2024-10-05 03:30+0500\n"
+"PO-Revision-Date: 2024-10-05 03:30+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -18,32 +18,20 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.16.0\n"
 
-msgid "welcome_back"
-msgstr "Welcome back!"
-
 msgid "choose_language"
-msgstr "Please select your language."
-
-msgid "language_selected"
-msgstr "Language has been successfully selected!"
-
-msgid "start_registration"
-msgstr "Please start registration. What is your gender?"
+msgstr "Choose language"
 
 msgid "enter_nickname"
-msgstr "Please enter your nickname."
+msgstr "Enter your nickname"
 
-msgid "nickname_saved"
-msgstr "The nickname is saved!"
+msgid "enter_birth_year"
+msgstr "Enter your birth year"
 
-msgid "gender_saved"
-msgstr "Gender saved!"
+msgid "age_saved"
+msgstr "Age saved"
 
-msgid "choose_orientation"
-msgstr "Now choose your orientation."
-
-msgid "invalid_orientation"
-msgstr "Invalid orientation. Please choose one of the available options."
+msgid "start_registration"
+msgstr "Please start your registration"
 
 msgid "gender_male"
 msgstr "Male"
@@ -72,29 +60,198 @@ msgstr "Asexual"
 msgid "orientation_lesbian"
 msgstr "Lesbian"
 
+msgid "music"
+msgstr "Music"
+
+msgid "cinema"
+msgstr "Cinema"
+
+msgid "sport"
+msgstr "Sport"
+
+msgid "technology"
+msgstr "Technology"
+
+msgid "done"
+msgstr "Done"
+
+msgid "registration_completed"
+msgstr "Registration completed"
+
+msgid "ask_add_photo"
+msgstr "Would you like to add a photo?"
+
+msgid "send_profile_photo"
+msgstr "Please send a profile photo"
+
+msgid "invalid_media"
+msgstr "Invalid media type"
+
+msgid "location_saved"
+msgstr "Location saved"
+
+msgid "share_location_prompt"
+msgstr "Please share your location"
+
+msgid "share_location"
+msgstr "Share location"
+
+msgid "invalid_choice"
+msgstr "Invalid choice"
+
+msgid "show_profile"
+msgstr "Show profile"
+
+msgid "nickname"
+msgstr "Nickname"
+
+msgid "gender"
+msgstr "Gender"
+
+msgid "orientation"
+msgstr "Orientation"
+
+msgid "interests"
+msgstr "Interests"
+
+msgid "location"
+msgstr "Location"
+
+msgid "interest_added"
+msgstr "interest added"
+
+msgid "invalid_birth_year"
+msgstr "Invalid birth year"
+
+msgid "invalid_gender"
+msgstr "Invalid gender"
+
+msgid "invalid_orientation"
+msgstr "Invalid orientation"
+
+msgid "choose_more_interests"
+msgstr "Choose more interests"
+
+msgid "done_button_available"
+msgstr "Done button is now available"
+
+msgid "welcome_back"
+msgstr "Welcome back!"
+
+msgid "language_selected"
+msgstr "Language successfully selected!"
+
+msgid "nickname_saved"
+msgstr "Nickname saved!"
+
+msgid "gender_saved"
+msgstr "Gender saved!"
+
+msgid "choose_orientation"
+msgstr "Choose your orientation."
+
 msgid "orientation_heterosexual_female"
-msgstr "Heterosexual Female"
+msgstr "Heterosexual female"
 
 msgid "orientation_bisexual_female"
-msgstr "Bisexual Female"
+msgstr "Bisexual female"
 
 msgid "orientation_pansexual_female"
-msgstr "Pansexual Female"
+msgstr "Pansexual female"
 
 msgid "orientation_saved"
 msgstr "Orientation saved!"
 
 msgid "choose_interests"
-msgstr "Please provide your interests."
+msgstr "Choose your interests."
 
 msgid "interests_saved"
 msgstr "Interests saved!"
 
 msgid "choose_location"
-msgstr "Please provide your location."
+msgstr "Indicate your location."
 
 msgid "enter_custom_gender"
-msgstr "Please enter your gender."
+msgstr "Enter your custom gender."
 
 msgid "custom_gender_saved"
-msgstr "Your gender has been saved!"
+msgstr "Custom gender saved!"
+
+msgid "travel"
+msgstr "Travel"
+
+msgid "food"
+msgstr "Food"
+
+msgid "fashion"
+msgstr "Fashion"
+
+msgid "reading"
+msgstr "Reading"
+
+msgid "programming"
+msgstr "Programming"
+
+msgid "games"
+msgstr "Games"
+
+msgid "photography"
+msgstr "Photography"
+
+msgid "dancing"
+msgstr "Dancing"
+
+msgid "yoga"
+msgstr "Yoga"
+
+msgid "meditation"
+msgstr "Meditation"
+
+msgid "cooking"
+msgstr "Cooking"
+
+msgid "crossfit"
+msgstr "Crossfit"
+
+msgid "art"
+msgstr "Art"
+
+msgid "drawing"
+msgstr "Drawing"
+
+msgid "music_playing"
+msgstr "Playing music"
+
+msgid "singing"
+msgstr "Singing"
+
+msgid "psychology"
+msgstr "Psychology"
+
+msgid "science"
+msgstr "Science"
+
+msgid "cars"
+msgstr "Cars"
+
+msgid "motorcycles"
+msgstr "Motorcycles"
+
+msgid "extreme_sports"
+msgstr "Extreme sports"
+
+msgid "outdoor_cooking"
+msgstr "Outdoor cooking"
+
+msgid "camping"
+msgstr "Camping"
+
+msgid "movies"
+msgstr "Movies"
+
+msgid "location_request"
+msgstr "Please share your location to continue registration."
+
+msgid "interests_minimum"
+msgstr "Please select at least 3 interests."
+

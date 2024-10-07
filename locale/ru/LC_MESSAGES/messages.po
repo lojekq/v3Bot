@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-10-01 16:54+0500\n"
-"PO-Revision-Date: 2024-10-01 16:54+0500\n"
+"POT-Creation-Date: 2024-10-05 03:30+0500\n"
+"PO-Revision-Date: 2024-10-05 03:30+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
 "Language-Team: ru <LL@li.org>\n"
@@ -19,17 +19,20 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.16.0\n"
 
-msgid "welcome_back"
-msgstr "Добро пожаловать назад!"
-
 msgid "choose_language"
-msgstr "Пожалуйста, выберите язык."
+msgstr "Выберите язык"
 
-msgid "language_selected"
-msgstr "Язык успешно выбран!"
+msgid "enter_nickname"
+msgstr "Введите ваш никнейм"
+
+msgid "enter_birth_year"
+msgstr "Введите ваш год рождения"
+
+msgid "age_saved"
+msgstr "Возраст сохранён"
 
 msgid "start_registration"
-msgstr "Пожалуйста, начните регистрацию. Какой у вас пол?"
+msgstr "Начните регистрацию"
 
 msgid "gender_male"
 msgstr "Мужчина"
@@ -37,23 +40,8 @@ msgstr "Мужчина"
 msgid "gender_female"
 msgstr "Женщина"
 
-msgid "enter_nickname"
-msgstr "Пожалуйста, введите свой никнейм."
-
-msgid "nickname_saved"
-msgstr "Никнейм сохранен!"
-
 msgid "gender_other"
 msgstr "Другое"
-
-msgid "gender_saved"
-msgstr "Пол сохранен!"
-
-msgid "choose_orientation"
-msgstr "Теперь выберите ориентацию:"
-
-msgid "invalid_orientation"
-msgstr "Неправильная ориентация. Пожалуйста, выберите одну из предложенных."
 
 msgid "orientation_heterosexual"
 msgstr "Гетеросексуал"
@@ -68,10 +56,100 @@ msgid "orientation_pansexual"
 msgstr "Пансексуал"
 
 msgid "orientation_asexual"
-msgstr "Асексул"
+msgstr "Асексуал"
 
 msgid "orientation_lesbian"
 msgstr "Лесбиянка"
+
+msgid "music"
+msgstr "Музыка"
+
+msgid "cinema"
+msgstr "Кино"
+
+msgid "sport"
+msgstr "Спорт"
+
+msgid "technology"
+msgstr "Технологии"
+
+msgid "done"
+msgstr "Готово"
+
+msgid "registration_completed"
+msgstr "Регистрация завершена"
+
+msgid "ask_add_photo"
+msgstr "Хотите добавить фото?"
+
+msgid "send_profile_photo"
+msgstr "Пожалуйста, отправьте фото профиля"
+
+msgid "invalid_media"
+msgstr "Неверный тип медиа"
+
+msgid "location_saved"
+msgstr "Местоположение сохранено"
+
+msgid "share_location_prompt"
+msgstr "Пожалуйста, отправьте ваше местоположение"
+
+msgid "share_location"
+msgstr "Отправить местоположение"
+
+msgid "invalid_choice"
+msgstr "Неверный выбор"
+
+msgid "show_profile"
+msgstr "Показать профиль"
+
+msgid "nickname"
+msgstr "Никнейм"
+
+msgid "gender"
+msgstr "Пол"
+
+msgid "orientation"
+msgstr "Ориентация"
+
+msgid "interests"
+msgstr "Интересы"
+
+msgid "location"
+msgstr "Местоположение"
+
+msgid "interest_added"
+msgstr "Интерес добавлен"
+
+msgid "invalid_birth_year"
+msgstr "Неверный год рождения"
+
+msgid "invalid_gender"
+msgstr "Неверный пол"
+
+msgid "invalid_orientation"
+msgstr "Неверная ориентация"
+
+msgid "choose_more_interests"
+msgstr "Выберите больше интересов"
+
+msgid "done_button_available"
+msgstr "Кнопка 'Готово' теперь доступна"
+
+msgid "welcome_back"
+msgstr "С возвращением!"
+
+msgid "language_selected"
+msgstr "Язык успешно выбран!"
+
+msgid "nickname_saved"
+msgstr "Никнейм сохранён!"
+
+msgid "gender_saved"
+msgstr "Пол сохранён!"
+
+msgid "choose_orientation"
+msgstr "Выберите ориентацию."
 
 msgid "orientation_heterosexual_female"
 msgstr "Гетеросексуалка"
@@ -86,16 +164,95 @@ msgid "orientation_saved"
 msgstr "Ориентация сохранена!"
 
 msgid "choose_interests"
-msgstr "Пожалуйста, укажите свои интересы."
+msgstr "Выберите ваши интересы."
 
 msgid "interests_saved"
 msgstr "Интересы сохранены!"
 
 msgid "choose_location"
-msgstr "Пожалуйста, укажите ваше местоположение."
+msgstr "Укажите своё местоположение."
 
 msgid "enter_custom_gender"
-msgstr "Пожалуйста, введите ваш пол."
+msgstr "Введите свой пол."
 
 msgid "custom_gender_saved"
-msgstr "Ваш пол сохранен!"
+msgstr "Ваш пол сохранён!"
+
+msgid "travel"
+msgstr "Путешествия"
+
+msgid "food"
+msgstr "Еда"
+
+msgid "fashion"
+msgstr "Мода"
+
+msgid "reading"
+msgstr "Чтение"
+
+msgid "programming"
+msgstr "Программирование"
+
+msgid "games"
+msgstr "Игры"
+
+msgid "photography"
+msgstr "Фотография"
+
+msgid "dancing"
+msgstr "Танцы"
+
+msgid "yoga"
+msgstr "Йога"
+
+msgid "meditation"
+msgstr "Медитация"
+
+msgid "cooking"
+msgstr "Кулинария"
+
+msgid "crossfit"
+msgstr "Кроссфит"
+
+msgid "art"
+msgstr "Искусство"
+
+msgid "drawing"
+msgstr "Рисование"
+
+msgid "music_playing"
+msgstr "Игра на музыкальных инструментах"
+
+msgid "singing"
+msgstr "Пение"
+
+msgid "psychology"
+msgstr "Психология"
+
+msgid "science"
+msgstr "Наука"
+
+msgid "cars"
+msgstr "Автомобили"
+
+msgid "motorcycles"
+msgstr "Мотоциклы"
+
+msgid "extreme_sports"
+msgstr "Экстремальный спорт"
+
+msgid "outdoor_cooking"
+msgstr "Готовка на свежем воздухе"
+
+msgid "camping"
+msgstr "Кемпинг"
+
+msgid "movies"
+msgstr "Фильмы"
+
+msgid "location_request"
+msgstr "Чтобы продолжить регистрацию, укажите своё местоположение."
+
+msgid "interests_minimum"
+msgstr "Выберите не менее трёх интересов."
+
