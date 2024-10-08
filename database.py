@@ -232,10 +232,21 @@ async def block_user(blocker_id, blocked_id):
 # Функция добавления завершенного чата
 async def add_finished_chat(user_id, partner_id):
     async with db.acquire() as conn:
-        async with conn.cursor() as cursor:
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            # Проверяем, существует ли уже завершённый чат
+            await cursor.execute(
+                "SELECT * FROM finished_chats WHERE user_id = %s AND partner_id = %s",
+                (user_id, partner_id)
+            )
+            result = await cursor.fetchone()
+            if result:
+                logging.info("Запись уже существует, не нужно добавлять снова.")
+                return
+
+            # Если записи нет, добавляем её
             query = "INSERT INTO finished_chats (user_id, partner_id) VALUES (%s, %s)"
             await cursor.execute(query, (user_id, partner_id))
-            await conn.commit()
+
 
 # Функция поиска совпадений с учетом завершенных чатов
 async def find_match(user_id, gender, orientation, interests, location, max_distance=10):
@@ -373,19 +384,23 @@ async def get_chat_history(user_id, partner_id):
             return await cursor.fetchall()
         
 async def add_active_chat(user_id: int, partner_id: int):
+    existing_chat = await get_active_chat(user_id)
     async with db.acquire() as conn:
         async with conn.cursor() as cursor:
-            await cursor.execute(
-                "INSERT INTO active_chats (user_id, partner_id) VALUES (%s, %s)",
-                (user_id, partner_id)
-            )
+            if not existing_chat:
+                # Если нет активного чата, добавляем его
+                await cursor.execute(
+                    "INSERT INTO active_chats (user_id, partner_id) VALUES (%s, %s)",
+                    (user_id, partner_id)
+                )
             await conn.commit()
 
 async def remove_active_chat(user_id: int):
     async with db.acquire() as conn:
         async with conn.cursor() as cursor:
+            # Обновляем статус чата вместо удаления
             await cursor.execute(
-                "DELETE FROM active_chats WHERE user_id = %s OR partner_id = %s",
+                "UPDATE active_chats SET status = 'finished' WHERE user_id = %s OR partner_id = %s",
                 (user_id, user_id)
             )
             await conn.commit()
@@ -397,4 +412,18 @@ async def get_active_chat(user_id: int):
                 "SELECT * FROM active_chats WHERE user_id = %s OR partner_id = %s",
                 (user_id, user_id)
             )
-            return await cursor.fetchone()
+            result = await cursor.fetchone()
+            
+            # Проверяем, чтобы partner_id был другим пользователем
+            if result:
+                if result['user_id'] == user_id:
+                    return {'partner_id': result['partner_id']}
+                else:
+                    return {'partner_id': result['user_id']}
+
+async def is_nickname_taken(nickname: str) -> bool:
+    async with db.acquire() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute("SELECT COUNT(*) FROM users WHERE username = %s", (nickname,))
+            result = await cursor.fetchone()
+            return result[0] > 0

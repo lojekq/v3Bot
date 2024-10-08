@@ -6,7 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.filters import Command
 from database import (
-    get_user_by_id, create_user, get_user_interests, get_user_language, update_user_photo, update_user_age,
+    get_user_by_id, create_user, get_user_interests, get_user_language, is_nickname_taken, update_user_photo, update_user_age,
     update_user_language, update_user_gender, update_user_orientation,
     update_user_interests, update_user_nickname, update_user_location,
     update_user_custom_gender, update_user_ban_until, update_user_birth_year
@@ -158,9 +158,16 @@ async def set_user_language(message: types.Message, state: FSMContext, bot: Bot)
 
 
 # Ввод никнейма
+
 @registration_router.message(StateFilter(Registration.nickname))
 async def set_nickname(message: types.Message, state: FSMContext, bot: Bot):
     await safe_send_user_message(message, state)
+
+    # Проверяем, занят ли никнейм
+    if await is_nickname_taken(message.text):
+        await message.answer("Этот никнейм уже занят. Пожалуйста, выберите другой.")
+        return
+    
     user = await get_user_by_id(message.from_user.id)
     if user:
         await update_user_nickname(message.from_user.id, message.text)
@@ -471,7 +478,7 @@ async def process_location(message: types.Message, state: FSMContext, bot: Bot):
             # После завершения регистрации и локации показываем профиль и удаляем все сообщения
             await safe_send_message(message, translate('registration_completed', lang_code), state)
             await show_profile(message, bot)
-            await message.answer("", reply_markup=initial_keyboard(lang_code))
+            await message.answer("", reply_markup=initial_keyboard())
             await delete_registration_messages(message, state)  # Удаление сообщений
             await state.clear()  # Очистка состояния
         else:
