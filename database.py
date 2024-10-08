@@ -193,73 +193,63 @@ async def update_user_custom_gender(user_id, custom_gender):
             await conn.commit()
 
 # Добавление в список ожидания
-async def add_to_waiting_list(user_id, gender, orientation, interests, location):
+async def add_to_waiting_list(user_id, username, gender, orientation, interests, location):
     async with db.acquire() as conn:
         async with conn.cursor() as cursor:
-            # Сначала проверяем, существует ли запись с таким user_id
-            query_check = "SELECT user_id FROM waiting_list WHERE user_id = %s"
-            await cursor.execute(query_check, (user_id,))
-            existing_user = await cursor.fetchone()
+            query = """
+                INSERT INTO waiting_list (user_id, username, gender, orientation, interests, location, request_time)
+                VALUES (%s, %s, %s, %s, %s, %s, NOW()) AS new_data
+                ON DUPLICATE KEY UPDATE
+                    username = new_data.username,
+                    gender = new_data.gender,
+                    orientation = new_data.orientation,
+                    interests = new_data.interests,
+                    location = new_data.location,
+                    request_time = NOW()
+            """
+            await cursor.execute(query, (user_id, username, gender, orientation, interests, location))
+            await conn.commit()
 
-            if existing_user:
-                # Если пользователь уже в списке ожидания, можно обновить его данные или пропустить
-                query_update = """
-                UPDATE waiting_list
-                SET gender = %s, orientation = %s, interests = %s, location = %s, request_time = NOW()
-                WHERE user_id = %s
-                """
-                await cursor.execute(query_update, (gender, orientation, interests, location, user_id))
-                await conn.commit()
-            else:
-                # Если пользователь не в списке ожидания, добавляем его
-                query_insert = """
-                INSERT INTO waiting_list (user_id, gender, orientation, interests, location, request_time)
-                VALUES (%s, %s, %s, %s, %s, NOW())
-                """
-                await cursor.execute(query_insert, (user_id, gender, orientation, interests, location))
-                await conn.commit()
 
 
 # Поиск совпадений с учетом пола, ориентации и интересов
 async def find_match(user_id, gender, orientation, interests, location):
     async with db.acquire() as conn:
         async with conn.cursor(aiomysql.DictCursor) as cursor:
-            # Логика определения пола для поиска
             search_gender = None
-            if orientation == 'Гетеросексуал' or orientation == 'Гетеросексуалка':
+            if orientation == 'Heterosexual':
                 search_gender = 'Female' if gender == 'Male' else 'Male'
-            elif orientation == 'Гомосексуал' or orientation == 'Лесбиянка':
+            elif orientation == 'Homosexual' or orientation == 'Lesbian':
                 search_gender = gender  # Ищем тот же пол для гомосексуалов и лесбиянок
-            elif orientation == 'Бисексуал':
-                search_gender = None  # Бисексуал может искать любой пол
+            elif orientation == 'Bisexual':
+                search_gender = None  # Бисексуалы могут искать любой пол
 
             # Преобразуем интересы в строку для использования в запросе
-            interests_list = interests.split(',')  # Предполагается, что интересы разделены запятыми
+            interests_list = interests.split(',')
             interests_conditions = " OR ".join([f"interests LIKE %s" for _ in interests_list])
-            interests_like = ' OR '.join([f"interests LIKE %s" for _ in interests_list])
             interests_values = [f"%{interest.strip()}%" for interest in interests_list]
-            
+
+            # Выполняем запрос
             query_exact = f"""
-                SELECT user_id FROM waiting_list 
+                SELECT user_id, username FROM waiting_list 
                 WHERE 
                     gender = %s 
                     AND orientation = %s 
-                    AND ({interests_like})
+                    AND ({interests_conditions})
                     AND location = %s
                     AND user_id != %s
                 LIMIT 1
             """
-            
-            params = [search_gender, orientation] + [f"%{interest}%" for interest in interests_list] + [location, user_id]
+            params = [search_gender, orientation] + interests_values + [location, user_id]
             await cursor.execute(query_exact, params)
             match = await cursor.fetchone()
-            
+
             if match:
                 return match
 
-            # 2. Частичное совпадение по полу и ориентации, без учета местоположения
+            # Если нет полного совпадения, выполняем частичный поиск
             query_partial = f"""
-                SELECT user_id FROM waiting_list 
+                SELECT user_id, username FROM waiting_list 
                 WHERE 
                     gender = %s 
                     AND orientation = %s 
@@ -267,26 +257,22 @@ async def find_match(user_id, gender, orientation, interests, location):
                     AND user_id != %s
                 LIMIT 1
             """
-            params = [search_gender, orientation, *interests_values, user_id]
+            params = [search_gender, orientation] + interests_values + [user_id]
             await cursor.execute(query_partial, params)
             match = await cursor.fetchone()
 
             if match:
-                return match  # Если найдено частичное совпадение, возвращаем его
+                return match
 
-            # 3. Гибкое совпадение только по полу и ориентации
-            query_flexible = """
-                SELECT user_id FROM waiting_list 
-                WHERE 
-                    gender = %s 
-                    AND orientation = %s
-                    AND user_id != %s
-                LIMIT 1
-            """
-            await cursor.execute(query_flexible, (search_gender, orientation, user_id))
-            match = await cursor.fetchone()
+            return None
 
-            return match  # Возвращаем найденное совпадение или None
+# Удаление пользователя из списка ожидания
+async def remove_from_waiting_list(user_id):
+    async with db.acquire() as conn:
+        async with conn.cursor() as cursor:
+            query = "DELETE FROM waiting_list WHERE user_id = %s"
+            await cursor.execute(query, (user_id,))
+            await conn.commit()
 
 # Получение языка пользователя
 async def get_user_language(user_id):
