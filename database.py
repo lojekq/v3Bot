@@ -3,6 +3,8 @@ import os
 import aiomysql
 from dotenv import load_dotenv
 
+from utils import calculate_distance
+
 db = None  # Глобальная переменная для пула соединений
 
 # Загрузка переменных окружения
@@ -210,60 +212,106 @@ async def add_to_waiting_list(user_id, username, gender, orientation, interests,
             await cursor.execute(query, (user_id, username, gender, orientation, interests, location))
             await conn.commit()
 
+# Функция для блокировки пользователя
+async def block_user(blocker_id, blocked_id):
+    async with db.acquire() as conn:
+        async with conn.cursor() as cursor:
+            # Проверяем, если пользователь уже заблокирован
+            query = "SELECT 1 FROM blocked_users WHERE blocker_id = %s AND blocked_id = %s"
+            await cursor.execute(query, (blocker_id, blocked_id))
+            result = await cursor.fetchone()
 
+            if not result:
+                # Если пользователь не заблокирован, добавляем в таблицу
+                query = "INSERT INTO blocked_users (blocker_id, blocked_id) VALUES (%s, %s)"
+                await cursor.execute(query, (blocker_id, blocked_id))
+                await conn.commit()
+            else:
+                logging.info(f"Пользователь {blocked_id} уже заблокирован пользователем {blocker_id}.")
 
 # Поиск совпадений с учетом пола, ориентации и интересов
-async def find_match(user_id, gender, orientation, interests, location):
+async def find_match(user_id, gender, orientation, interests, location, max_distance=10):
     async with db.acquire() as conn:
         async with conn.cursor(aiomysql.DictCursor) as cursor:
-            search_gender = None
+            user_lat, user_lon = map(float, location.split(','))
+
+            # Определение гендера для поиска на основе ориентации
             if orientation == 'Heterosexual':
                 search_gender = 'Female' if gender == 'Male' else 'Male'
-            elif orientation == 'Homosexual' or orientation == 'Lesbian':
-                search_gender = gender  # Ищем тот же пол для гомосексуалов и лесбиянок
-            elif orientation == 'Bisexual':
-                search_gender = None  # Бисексуалы могут искать любой пол
+            elif orientation in ['Homosexual', 'Lesbian']:
+                search_gender = gender  # Ищем тот же пол
+            else:  # Bisexual or any other
+                search_gender = None  # Открытый поиск без учета пола
 
-            # Преобразуем интересы в строку для использования в запросе
+            # Преобразуем интересы в список
             interests_list = interests.split(',')
-            interests_conditions = " OR ".join([f"interests LIKE %s" for _ in interests_list])
-            interests_values = [f"%{interest.strip()}%" for interest in interests_list]
 
-            # Выполняем запрос
-            query_exact = f"""
-                SELECT user_id, username FROM waiting_list 
-                WHERE 
-                    gender = %s 
-                    AND orientation = %s 
-                    AND ({interests_conditions})
-                    AND location = %s
-                    AND user_id != %s
-                LIMIT 1
+            # Запрос для проверки заблокированных пользователей и завершенных чатов
+            blocked_users_query = """
+                SELECT blocked_id FROM blocked_users WHERE blocker_id = %s
+                UNION
+                SELECT blocker_id FROM blocked_users WHERE blocked_id = %s
             """
-            params = [search_gender, orientation] + interests_values + [location, user_id]
-            await cursor.execute(query_exact, params)
-            match = await cursor.fetchone()
+            await cursor.execute(blocked_users_query, (user_id, user_id))
+            blocked_users = [row['blocked_id'] for row in await cursor.fetchall()]
 
-            if match:
-                return match
-
-            # Если нет полного совпадения, выполняем частичный поиск
-            query_partial = f"""
-                SELECT user_id, username FROM waiting_list 
-                WHERE 
-                    gender = %s 
-                    AND orientation = %s 
-                    AND ({interests_conditions})
-                    AND user_id != %s
-                LIMIT 1
+            # Проверка истории завершенных чатов
+            past_chats_query = """
+                SELECT partner_id FROM chat_history WHERE user_id = %s
+                UNION
+                SELECT user_id FROM chat_history WHERE partner_id = %s
             """
-            params = [search_gender, orientation] + interests_values + [user_id]
-            await cursor.execute(query_partial, params)
-            match = await cursor.fetchone()
+            await cursor.execute(past_chats_query, (user_id, user_id))
+            past_chats = [row['partner_id'] for row in await cursor.fetchall()]
 
-            if match:
-                return match
+            # Основной цикл для поиска совпадений, начиная с полного совпадения по интересам
+            for interests_count in range(len(interests_list), -1, -1):
+                if interests_count > 0:
+                    # Динамическое создание условий для поиска по интересам
+                    interests_conditions = " OR ".join([f"interests LIKE %s" for _ in range(interests_count)])
+                    interests_values = [f"%{interest.strip()}%" for interest in interests_list[:interests_count]]
+                else:
+                    # Если количество интересов равно 0, пропускаем условие по интересам
+                    interests_conditions = "1 = 1"
+                    interests_values = []
 
+                # Запрос на поиск пользователя с учетом блокировок и завершенных чатов
+                blocked_users_filter = ""
+                if blocked_users:
+                    blocked_users_filter = f"AND user_id NOT IN ({','.join(['%s'] * len(blocked_users))})"
+                
+                past_chats_filter = ""
+                if past_chats:
+                    past_chats_filter = f"AND user_id NOT IN ({','.join(['%s'] * len(past_chats))})"
+
+                query = f"""
+                    SELECT user_id, username, location, gender, orientation, interests
+                    FROM waiting_list
+                    WHERE user_id != %s
+                    {blocked_users_filter}  -- исключаем заблокированных
+                    {past_chats_filter}  -- исключаем завершенные чаты
+                    {"AND gender = %s" if search_gender else ""}
+                    AND ({interests_conditions})  -- проверка по интересам
+                """
+
+                # Составляем параметры для запроса
+                params = [user_id] + blocked_users + past_chats + interests_values
+                if search_gender:
+                    params.append(search_gender)
+
+                await cursor.execute(query, params)
+                matches = await cursor.fetchall()
+
+                # Проверяем каждого найденного пользователя по расстоянию
+                for match in matches:
+                    match_lat, match_lon = map(float, match['location'].split(','))
+                    distance = calculate_distance(user_lat, user_lon, match_lat, match_lon)
+
+                    # Проверяем расстояние, если оно меньше или равно max_distance, возвращаем совпадение
+                    if distance <= max_distance:
+                        return match
+
+            # Если ничего не найдено
             return None
 
 # Удаление пользователя из списка ожидания
@@ -293,4 +341,3 @@ async def get_user_language(user_id):
             if result:
                 return result['lang']
             return 'en'  # Язык по умолчанию, если язык не установлен
-

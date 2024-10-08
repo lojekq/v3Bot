@@ -6,6 +6,7 @@ from aiogram.types import FSInputFile
 from aiogram import Router, types, Bot
 from aiogram.fsm.context import FSMContext
 from database import (
+    block_user,
     get_user_by_id, 
     add_to_waiting_list, 
     find_match,
@@ -15,6 +16,7 @@ from database import (
 )
 from localization import translate  # Импорт функции для перевода интересов
 from aiogram.filters import Command
+from utils import calculate_distance
 
 # Путь для сохранения медиафайлов
 MEDIA_PATH = 'media_files/'
@@ -25,21 +27,6 @@ matchmaking_router = Router()
 
 # Словарь для хранения чатов, чтобы бот знал, кто с кем общается
 active_chats = {}
-
-# Функция для расчета расстояния между двумя координатами (широта, долгота) в километрах
-def calculate_distance(lat1, lon1, lat2, lon2):
-    R = 6371.0  # Радиус Земли в километрах
-
-    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
-
-    dlon = lon2 - lon1
-    dlat = lat2 - lat1
-
-    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
-    c = 2 * atan2(sqrt(a), sqrt(1 - a))
-
-    distance = R * c
-    return distance
 
 # Функция для получения общих интересов
 def get_common_interests(user_interests, match_interests):
@@ -145,6 +132,27 @@ async def handle_exit_chat_button(message: types.Message, bot: Bot):
     else:
         await message.answer("Вы не находитесь в чате.")
 
+# Функция для блокировки пользователя
+@matchmaking_router.message(F.text == '🚫 Заблокировать')
+async def handle_block_user_button(message: types.Message, bot: Bot):
+    user_id = message.from_user.id
+
+    if user_id in active_chats:
+        partner_id = active_chats[user_id]
+
+        # Блокируем пользователя
+        await block_user(user_id, partner_id)
+
+        # Удаляем пользователей из активных чатов
+        del active_chats[user_id]
+        del active_chats[partner_id]
+
+        # Оповещаем обе стороны о блокировке
+        await message.answer("Вы заблокировали пользователя и завершили чат.")
+        await bot.send_message(partner_id, "Ваш собеседник заблокировал вас и завершил чат.")
+    else:
+        await message.answer("Вы не находитесь в активном чате.")
+        
 # Функция для сохранения медиафайлов
 async def save_media_file(file_id: str, file_type: str, message_id: int, user_id: int, bot: Bot):
     file_info = await bot.get_file(file_id)

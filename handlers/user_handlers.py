@@ -53,6 +53,7 @@ def matchmaking_keyboard():
         [KeyboardButton(text='🔍 Поиск')],
         [KeyboardButton(text='🚪 Покинуть поиск')],
         [KeyboardButton(text='❌ Выйти из чата')],
+        [KeyboardButton(text='🚫 Заблокировать')],
         [KeyboardButton(text='👤 Показать профиль')]  # Добавляем кнопку "Показать профиль"
     ]
     return ReplyKeyboardMarkup(keyboard=keyboard, resize_keyboard=True)
@@ -61,16 +62,6 @@ def matchmaking_keyboard():
 # Обработка нажатия кнопки "Показать профиль"
 @user_router.message(F.text == '👤 Показать профиль')
 async def handle_show_profile_button(message: types.Message, bot: Bot):
-    await show_profile(message, bot)
-
-# Обработка нажатия кнопки "Показать профиль"
-@user_router.message(F.text == '🚪 Покинуть поиск')
-async def handle_leave_match_button(message: types.Message, bot: Bot):
-    await show_profile(message, bot)
-
-# Обработка нажатия кнопки "Показать профиль"
-@user_router.message(F.text == '🔍 Поиск')
-async def handle_find_match_button(message: types.Message, bot: Bot):
     await show_profile(message, bot)
 
 # Показ профиля
