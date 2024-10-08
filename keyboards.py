@@ -4,7 +4,7 @@ from localization import set_language, translate
 # Первоначальная клавиатура (когда поиск еще не начат)
 def initial_keyboard():
     keyboard = [
-        [KeyboardButton(text='🔍 Поиск'), KeyboardButton(text='👤 Показать профиль')]
+        [KeyboardButton(text='🔍 Поиск'), KeyboardButton(text='📜 История'), KeyboardButton(text='👤 Показать профиль')]
     ]
     return ReplyKeyboardMarkup(keyboard=keyboard, resize_keyboard=True)
 

@@ -23,9 +23,7 @@ def set_language():
     from aiogram import types
     markup = types.ReplyKeyboardMarkup(
         keyboard=[
-            [types.KeyboardButton(text="English")],
-            [types.KeyboardButton(text="Русский")],
-            [types.KeyboardButton(text="Қазақша")]
+            [types.KeyboardButton(text="Русский")]
         ],
         resize_keyboard=True
     )

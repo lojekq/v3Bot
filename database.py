@@ -325,12 +325,13 @@ async def remove_from_waiting_list(user_id):
             await cursor.execute(query, (user_id,))
             await conn.commit()
 
-async def save_chat_message_to_db(sender_id, receiver_id, message_id, content):
+# Функция для сохранения сообщений чата в базу данных
+async def save_chat_message_to_db(sender_id, receiver_id, message_id, content, msg_type='text'):
     async with db.acquire() as conn:
         async with conn.cursor() as cursor:
             await cursor.execute(
-                "INSERT INTO chat_messages (sender_id, receiver_id, message_id, content) VALUES (%s, %s, %s, %s)",
-                (sender_id, receiver_id, message_id, content)
+                "INSERT INTO chat_messages (sender_id, receiver_id, message_id, content, type) VALUES (%s, %s, %s, %s, %s)",
+                (sender_id, receiver_id, message_id, content, msg_type)
             )
             await conn.commit()
 
@@ -344,3 +345,56 @@ async def get_user_language(user_id):
             if result:
                 return result['lang']
             return 'en'  # Язык по умолчанию, если язык не установлен
+
+# Получение завершённых чатов пользователя
+async def get_finished_chats(user_id):
+    async with db.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            query = """
+                SELECT fc.user_id, fc.partner_id, u.username
+                FROM finished_chats fc
+                JOIN users u ON fc.partner_id = u.user_id
+                WHERE fc.user_id = %s
+            """
+            await cursor.execute(query, (user_id,))
+            return await cursor.fetchall()
+
+
+# Получение истории чатов между двумя пользователями
+async def get_chat_history(user_id, partner_id):
+    async with db.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            await cursor.execute("""
+                SELECT * FROM chat_messages 
+                WHERE (sender_id = %s AND receiver_id = %s) 
+                OR (sender_id = %s AND receiver_id = %s)
+                ORDER BY message_id ASC
+            """, (user_id, partner_id, partner_id, user_id))
+            return await cursor.fetchall()
+        
+async def add_active_chat(user_id: int, partner_id: int):
+    async with db.acquire() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute(
+                "INSERT INTO active_chats (user_id, partner_id) VALUES (%s, %s)",
+                (user_id, partner_id)
+            )
+            await conn.commit()
+
+async def remove_active_chat(user_id: int):
+    async with db.acquire() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute(
+                "DELETE FROM active_chats WHERE user_id = %s OR partner_id = %s",
+                (user_id, user_id)
+            )
+            await conn.commit()
+
+async def get_active_chat(user_id: int):
+    async with db.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            await cursor.execute(
+                "SELECT * FROM active_chats WHERE user_id = %s OR partner_id = %s",
+                (user_id, user_id)
+            )
+            return await cursor.fetchone()

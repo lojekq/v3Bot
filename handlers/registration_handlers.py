@@ -149,9 +149,7 @@ async def set_user_language(message: types.Message, state: FSMContext, bot: Bot)
     await safe_send_user_message(message, state)
     
     language_map = {
-        "English": "en",
-        "Русский": "ru",
-        "Қазақша": "kz"
+        "Русский": "ru"
     }
     lang_code = language_map.get(message.text, 'en')
     await update_user_language(message.from_user.id, lang_code)

@@ -12,6 +12,7 @@ from handlers.admin_handlers import admin_router
 from handlers.operator_handlers import operator_router
 from handlers.moderator_handlers import moderator_router
 from handlers.registration_handlers import registration_router
+from handlers.history_handlers import history_router
 from handlers.matchmaking_handlers import matchmaking_router
 
 
@@ -37,6 +38,7 @@ dp.include_router(admin_router)
 dp.include_router(operator_router)
 dp.include_router(moderator_router)
 dp.include_router(registration_router)
+dp.include_router(history_router)
 dp.include_router(matchmaking_router)
 
 
