@@ -229,13 +229,21 @@ async def block_user(blocker_id, blocked_id):
             else:
                 logging.info(f"Пользователь {blocked_id} уже заблокирован пользователем {blocker_id}.")
 
-# Поиск совпадений с учетом пола, ориентации и интересов
+# Функция добавления завершенного чата
+async def add_finished_chat(user_id, partner_id):
+    async with db.acquire() as conn:
+        async with conn.cursor() as cursor:
+            query = "INSERT INTO finished_chats (user_id, partner_id) VALUES (%s, %s)"
+            await cursor.execute(query, (user_id, partner_id))
+            await conn.commit()
+
+# Функция поиска совпадений с учетом завершенных чатов
 async def find_match(user_id, gender, orientation, interests, location, max_distance=10):
     async with db.acquire() as conn:
         async with conn.cursor(aiomysql.DictCursor) as cursor:
             user_lat, user_lon = map(float, location.split(','))
 
-            # Определение гендера для поиска на основе ориентации
+            # Определение гендера для поиска
             if orientation == 'Heterosexual':
                 search_gender = 'Female' if gender == 'Male' else 'Male'
             elif orientation in ['Homosexual', 'Lesbian']:
@@ -246,7 +254,7 @@ async def find_match(user_id, gender, orientation, interests, location, max_dist
             # Преобразуем интересы в список
             interests_list = interests.split(',')
 
-            # Запрос для проверки заблокированных пользователей и завершенных чатов
+            # Запрос для проверки заблокированных пользователей
             blocked_users_query = """
                 SELECT blocked_id FROM blocked_users WHERE blocker_id = %s
                 UNION
@@ -255,47 +263,44 @@ async def find_match(user_id, gender, orientation, interests, location, max_dist
             await cursor.execute(blocked_users_query, (user_id, user_id))
             blocked_users = [row['blocked_id'] for row in await cursor.fetchall()]
 
-            # Проверка истории завершенных чатов
-            past_chats_query = """
-                SELECT partner_id FROM chat_history WHERE user_id = %s
-                UNION
-                SELECT user_id FROM chat_history WHERE partner_id = %s
+            # Проверка завершенных чатов
+            finished_chats_query = """
+                SELECT partner_id FROM finished_chats WHERE user_id = %s
             """
-            await cursor.execute(past_chats_query, (user_id, user_id))
-            past_chats = [row['partner_id'] for row in await cursor.fetchall()]
+            await cursor.execute(finished_chats_query, (user_id,))
+            finished_chats = [row['partner_id'] for row in await cursor.fetchall()]
 
-            # Основной цикл для поиска совпадений, начиная с полного совпадения по интересам
+            # Основной цикл для поиска совпадений
             for interests_count in range(len(interests_list), -1, -1):
                 if interests_count > 0:
                     # Динамическое создание условий для поиска по интересам
-                    interests_conditions = " OR ".join([f"interests LIKE %s" for _ in range(interests_count)])
+                    interests_conditions = " OR ".join([f"wl.interests LIKE %s" for _ in range(interests_count)])
                     interests_values = [f"%{interest.strip()}%" for interest in interests_list[:interests_count]]
                 else:
-                    # Если количество интересов равно 0, пропускаем условие по интересам
                     interests_conditions = "1 = 1"
                     interests_values = []
 
-                # Запрос на поиск пользователя с учетом блокировок и завершенных чатов
                 blocked_users_filter = ""
                 if blocked_users:
-                    blocked_users_filter = f"AND user_id NOT IN ({','.join(['%s'] * len(blocked_users))})"
-                
-                past_chats_filter = ""
-                if past_chats:
-                    past_chats_filter = f"AND user_id NOT IN ({','.join(['%s'] * len(past_chats))})"
+                    blocked_users_filter = f"AND wl.user_id NOT IN ({','.join(['%s'] * len(blocked_users))})"
 
+                finished_chats_filter = ""
+                if finished_chats:
+                    finished_chats_filter = f"AND wl.user_id NOT IN ({','.join(['%s'] * len(finished_chats))})"
+
+                # Запрос на поиск пользователя с учетом блокировок и завершенных чатов
                 query = f"""
-                    SELECT user_id, username, location, gender, orientation, interests
-                    FROM waiting_list
-                    WHERE user_id != %s
+                    SELECT wl.user_id, wl.username, wl.location, wl.gender, wl.orientation, wl.interests
+                    FROM waiting_list wl
+                    WHERE wl.user_id != %s
                     {blocked_users_filter}  -- исключаем заблокированных
-                    {past_chats_filter}  -- исключаем завершенные чаты
-                    {"AND gender = %s" if search_gender else ""}
-                    AND ({interests_conditions})  -- проверка по интересам
+                    {finished_chats_filter}  -- исключаем пользователей с завершенными чатами
+                    {"AND wl.gender = %s" if search_gender else ""}
+                    AND ({interests_conditions})
                 """
 
                 # Составляем параметры для запроса
-                params = [user_id] + blocked_users + past_chats + interests_values
+                params = [user_id] + blocked_users + finished_chats + interests_values
                 if search_gender:
                     params.append(search_gender)
 
@@ -307,11 +312,9 @@ async def find_match(user_id, gender, orientation, interests, location, max_dist
                     match_lat, match_lon = map(float, match['location'].split(','))
                     distance = calculate_distance(user_lat, user_lon, match_lat, match_lon)
 
-                    # Проверяем расстояние, если оно меньше или равно max_distance, возвращаем совпадение
                     if distance <= max_distance:
                         return match
 
-            # Если ничего не найдено
             return None
 
 # Удаление пользователя из списка ожидания

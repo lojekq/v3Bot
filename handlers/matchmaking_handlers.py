@@ -6,6 +6,7 @@ from aiogram.types import FSInputFile
 from aiogram import Router, types, Bot
 from aiogram.fsm.context import FSMContext
 from database import (
+    add_finished_chat,
     block_user,
     get_user_by_id, 
     add_to_waiting_list, 
@@ -114,23 +115,27 @@ async def handle_leave_match_button(message: types.Message):
     else:
         await message.answer("Пользователь не найден. Попробуйте зарегистрироваться заново.")
 
-# Функция для завершения чата
+# Обновление функции завершения чата
 @matchmaking_router.message(F.text == '❌ Выйти из чата')
 async def handle_exit_chat_button(message: types.Message, bot: Bot):
     user_id = message.from_user.id
-    # Проверяем, есть ли активный чат для пользователя
     if user_id in active_chats:
         partner_id = active_chats[user_id]
-        
+
+        # Добавляем завершенные чаты в таблицу
+        await add_finished_chat(user_id, partner_id)
+        await add_finished_chat(partner_id, user_id)
+
         # Удаляем пользователей из активных чатов
         del active_chats[user_id]
         del active_chats[partner_id]
-        
+
         # Оповещаем обе стороны о завершении чата
         await message.answer("Вы завершили чат.")
         await bot.send_message(partner_id, "Ваш собеседник завершил чат.")
     else:
         await message.answer("Вы не находитесь в чате.")
+
 
 # Функция для блокировки пользователя
 @matchmaking_router.message(F.text == '🚫 Заблокировать')
