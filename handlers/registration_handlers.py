@@ -15,6 +15,7 @@ from localization import set_language, translate
 from aiogram.filters import StateFilter
 from aiogram.types import FSInputFile
 from datetime import datetime
+from keyboards import initial_keyboard
 
 registration_router = Router()
 
@@ -472,22 +473,11 @@ async def process_location(message: types.Message, state: FSMContext, bot: Bot):
             # После завершения регистрации и локации показываем профиль и удаляем все сообщения
             await safe_send_message(message, translate('registration_completed', lang_code), state)
             await show_profile(message, bot)
+            await message.answer("", reply_markup=initial_keyboard(lang_code))
             await delete_registration_messages(message, state)  # Удаление сообщений
             await state.clear()  # Очистка состояния
         else:
             await message.answer(translate('location_error', lang_code))
-
-# Клавиатура для отображения кнопки "Показать профиль"
-def get_show_profile_keyboard(lang_code):
-    buttons = [
-        [types.KeyboardButton(text=translate('show_profile', lang_code))],
-    ]
-    return types.ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
-
-# Обработка нажатия кнопки "Показать профиль"
-@registration_router.message(F.text == translate('show_profile', 'en'))
-async def handle_show_profile(message: types.Message, bot: Bot):
-    await show_profile(message, bot)
 
 # Показ профиля
 async def show_profile(message: types.Message, bot: Bot):

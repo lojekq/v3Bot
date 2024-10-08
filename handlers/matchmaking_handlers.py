@@ -15,6 +15,7 @@ from database import (
     remove_from_waiting_list,
     save_chat_message_to_db  # Добавляем функцию для сохранения сообщений в БД
 )
+from keyboards import initial_keyboard, search_keyboard, match_keyboard
 from localization import translate  # Импорт функции для перевода интересов
 from aiogram.filters import Command
 from utils import calculate_distance
@@ -50,7 +51,6 @@ async def start_matchmaking(user_id, username, gender, orientation, interests, l
     else:
         return None, None
 
-# Обработка нажатия кнопки "Поиск"
 @matchmaking_router.message(F.text == '🔍 Поиск')
 async def handle_find_match_button(message: types.Message, bot: Bot):
     user = await get_user_by_id(message.from_user.id)
@@ -61,6 +61,9 @@ async def handle_find_match_button(message: types.Message, bot: Bot):
         location = user['location']
         username = user['username']
         lang_code = user['lang']  # Получаем язык пользователя
+
+        # Отправляем сообщение, что поиск начат, и меняем клавиатуру
+        await message.answer("Поиск начат, пожалуйста, подождите...", reply_markup=search_keyboard())
 
         match_user_id, match_username = await start_matchmaking(user['user_id'], username, gender, orientation, ', '.join(user_interests), location)
 
@@ -95,15 +98,16 @@ async def handle_find_match_button(message: types.Message, bot: Bot):
                 f"Расстояние между вами: {distance:.2f} км.\n"
                 f"Вы можете начать общение."
             )
-            await message.answer(match_info)
+            await message.answer(match_info, reply_markup=match_keyboard())  # Переход на клавиатуру для чата
             await bot.send_message(match_user_id, f"У вас есть совпадение с пользователем: {user['username']}.\n"
                                                  f"Общие интересы: {', '.join(translate_interests(common_interests, match_lang_code)) if common_interests else 'Нет общих интересов'}.\n"
                                                  f"Расстояние между вами: {distance:.2f} км.\n"
-                                                 f"Вы можете начать общение.")
+                                                 f"Вы можете начать общение.", reply_markup=match_keyboard())
         else:
-            await message.answer("Извините, не удалось найти совпадение.")
+            await message.answer("Извините, не удалось найти совпадение.", reply_markup=initial_keyboard())
     else:
         await message.answer("Пользователь не найден. Попробуйте зарегистрироваться заново.")
+
 
 # Обработка нажатия кнопки "Покинуть поиск"
 @matchmaking_router.message(F.text == '🚪 Покинуть поиск')
@@ -111,11 +115,11 @@ async def handle_leave_match_button(message: types.Message):
     user = await get_user_by_id(message.from_user.id)
     if user:
         await remove_from_waiting_list(user['user_id'])
-        await message.answer("Вы вышли из поиска.")
+        await message.answer("Вы вышли из поиска.", reply_markup=initial_keyboard())
     else:
         await message.answer("Пользователь не найден. Попробуйте зарегистрироваться заново.")
 
-# Обновление функции завершения чата
+
 @matchmaking_router.message(F.text == '❌ Выйти из чата')
 async def handle_exit_chat_button(message: types.Message, bot: Bot):
     user_id = message.from_user.id
@@ -131,11 +135,10 @@ async def handle_exit_chat_button(message: types.Message, bot: Bot):
         del active_chats[partner_id]
 
         # Оповещаем обе стороны о завершении чата
-        await message.answer("Вы завершили чат.")
-        await bot.send_message(partner_id, "Ваш собеседник завершил чат.")
+        await message.answer("Вы завершили чат.", reply_markup=search_keyboard())
+        await bot.send_message(partner_id, "Ваш собеседник завершил чат.", reply_markup=search_keyboard())
     else:
         await message.answer("Вы не находитесь в чате.")
-
 
 # Функция для блокировки пользователя
 @matchmaking_router.message(F.text == '🚫 Заблокировать')
@@ -153,10 +156,11 @@ async def handle_block_user_button(message: types.Message, bot: Bot):
         del active_chats[partner_id]
 
         # Оповещаем обе стороны о блокировке
-        await message.answer("Вы заблокировали пользователя и завершили чат.")
-        await bot.send_message(partner_id, "Ваш собеседник заблокировал вас и завершил чат.")
+        await message.answer("Вы заблокировали пользователя и завершили чат.", reply_markup=search_keyboard())
+        await bot.send_message(partner_id, "Ваш собеседник заблокировал вас и завершил чат.", reply_markup=search_keyboard())
     else:
         await message.answer("Вы не находитесь в активном чате.")
+
         
 # Функция для сохранения медиафайлов
 async def save_media_file(file_id: str, file_type: str, message_id: int, user_id: int, bot: Bot):

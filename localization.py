@@ -8,19 +8,13 @@ LOCALES_DIR = os.path.join(os.path.dirname(__file__), 'locale')
 def get_translations(lang_code):
     try:
         translations = Translations.load(LOCALES_DIR, [lang_code])
-        logging.info(f"Loaded translations for language: {lang_code}")
         return translations
     except FileNotFoundError:
-        logging.error(f"Translation file for {lang_code} not found, loading English as default.")
         return Translations.load(LOCALES_DIR, ['en'])
-
-
-
 
 
 def translate(message_key, lang_code):
     translations = get_translations(lang_code)
-    logging.info(f"Translating key: {message_key}, for language: {lang_code}")
     return translations.gettext(message_key)
 
 

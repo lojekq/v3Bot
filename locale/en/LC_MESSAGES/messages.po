@@ -255,3 +255,57 @@ msgstr "Please share your location to continue registration."
 msgid "interests_minimum"
 msgstr "Please select at least 3 interests."
 
+msgid "Search"
+msgstr "🔍 Search"
+
+msgid "Show_profile"
+msgstr "👤 Show profile"
+
+msgid "Leave_search"
+msgstr "🚪 Leave search"
+
+msgid "Exit_chat"
+msgstr "❌ Exit chat"
+
+msgid "Block"
+msgstr "🚫 Block"
+
+msgid "block_user"
+msgstr "Block User"
+
+msgid "chat_started"
+msgstr "Search started, please wait..."
+
+msgid "match_found"
+msgstr "Match found with user:"
+
+msgid "match_found_for_you"
+msgstr "Match found with user:"
+
+msgid "common_interests"
+msgstr "Common Interests"
+
+msgid "no_common_interests"
+msgstr "No common interests"
+
+msgid "distance"
+msgstr "Distance between you"
+
+msgid "start_chat"
+msgstr "You can start chatting."
+
+msgid "no_match_found"
+msgstr "Sorry, no match found."
+
+msgid "user_not_found"
+msgstr "User not found. Please try registering again."
+
+msgid "left_search"
+msgstr "You have left the search."
+
+msgid "blocked_user"
+msgstr "You have blocked the user and ended the chat."
+
+msgid "chat_finished"
+msgstr "You have finished the chat."
+

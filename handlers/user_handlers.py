@@ -6,9 +6,10 @@ from aiogram.fsm.context import FSMContext
 from database import get_user_by_id, get_user_interests, get_user_language
 from localization import translate
 from aiogram.filters import Command
-from handlers.registration_handlers import get_show_profile_keyboard, start_registration
+from handlers.registration_handlers import start_registration
 from handlers.matchmaking_handlers import handle_find_match_button, handle_leave_match_button
 from handlers.registration_handlers import registration_router
+from keyboards import initial_keyboard, search_keyboard, match_keyboard
 user_router = Router()
 
 # Настройка логирования
@@ -41,22 +42,12 @@ async def on_start_command(message: types.Message, state: FSMContext, bot: Bot):
     if user:
         lang_code = user.get('lang', 'en')  # Проверь, корректен ли этот код языка
         welcome_message = translate('welcome_back', lang_code)
-        await message.answer(welcome_message, reply_markup=matchmaking_keyboard())
+        await message.answer(welcome_message, reply_markup=initial_keyboard())
     else:
         await start_registration(message, state, bot)
 
         return
     
-# Функция создания клавиатуры
-def matchmaking_keyboard():
-    keyboard = [
-        [KeyboardButton(text='🔍 Поиск')],
-        [KeyboardButton(text='🚪 Покинуть поиск')],
-        [KeyboardButton(text='❌ Выйти из чата')],
-        [KeyboardButton(text='🚫 Заблокировать')],
-        [KeyboardButton(text='👤 Показать профиль')]  # Добавляем кнопку "Показать профиль"
-    ]
-    return ReplyKeyboardMarkup(keyboard=keyboard, resize_keyboard=True)
 
 
 # Обработка нажатия кнопки "Показать профиль"
