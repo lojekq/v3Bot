@@ -14,6 +14,7 @@ from handlers.moderator_handlers import moderator_router
 from handlers.registration_handlers import registration_router
 from handlers.matchmaking_handlers import matchmaking_router
 
+
 # Настройка логирования
 logging.basicConfig(
     level=logging.INFO,  # Вывод всех сообщений уровня INFO и выше
@@ -37,6 +38,7 @@ dp.include_router(operator_router)
 dp.include_router(moderator_router)
 dp.include_router(registration_router)
 dp.include_router(matchmaking_router)
+
 
 async def start_bot():
     # Инициализация базы данных

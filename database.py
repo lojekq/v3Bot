@@ -274,6 +274,16 @@ async def remove_from_waiting_list(user_id):
             await cursor.execute(query, (user_id,))
             await conn.commit()
 
+async def save_chat_message_to_db(sender_id, receiver_id, message_id, content):
+    async with db.acquire() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute(
+                "INSERT INTO chat_messages (sender_id, receiver_id, message_id, content) VALUES (%s, %s, %s, %s)",
+                (sender_id, receiver_id, message_id, content)
+            )
+            await conn.commit()
+
+
 # Получение языка пользователя
 async def get_user_language(user_id):
     async with db.acquire() as conn:
