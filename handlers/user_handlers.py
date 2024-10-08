@@ -4,6 +4,7 @@ from aiogram import F
 from aiogram.types import FSInputFile, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.fsm.context import FSMContext
 from database import get_user_by_id, get_user_interests, get_user_language
+from handlers.settings_handlers import CUSTOM_INTERESTS_LIST
 from localization import translate
 from aiogram.filters import Command
 from handlers.registration_handlers import start_registration
@@ -59,27 +60,28 @@ async def handle_show_profile_button(message: types.Message, bot: Bot):
 async def show_profile(message: types.Message, bot: Bot):
     user = await get_user_by_id(message.from_user.id)
     if user:
-        user_lang = await get_user_language(message.from_user.id)
+        lang_code = await get_user_language(message.from_user.id)
         gender_key = GENDER_MAP.get(user.get('gender', 'Other'), 'gender_other')
-        gender = translate(gender_key, user_lang)
+        gender = translate(gender_key, lang_code)
         orientation_key = ORIENTATION_MAP.get(user.get('orientation', 'Heterosexual'), 'orientation_heterosexual')
-        orientation = translate(orientation_key, user_lang)
+        orientation = translate(orientation_key, lang_code)
         nickname = user.get('username', 'N/A')
         interests_list = await get_user_interests(message.from_user.id)
 
+        # Перевод интересов с использованием translate()
         if interests_list:
-            interests_str = ', '.join([translate(interest.lower(), user_lang) for interest in interests_list])
+            interests_str = ', '.join([translate(CUSTOM_INTERESTS_LIST.get(interest, {}).get(lang_code, interest), lang_code) for interest in interests_list])
         else:
-            interests_str = translate('no_interests', user_lang)
+            interests_str = translate('no_interests', lang_code)
 
         location = user.get('location', 'N/A')
         profile_info = (
-            f"👤 {translate('nickname', user_lang)}: {nickname}\n"
-            f"🚻 {translate('gender', user_lang)}: {gender}\n"
-            f"🎯 {translate('orientation', user_lang)}: {orientation}\n"
-            f"📚 {translate('interests', user_lang)}: {interests_str}\n"
+            f"👤 {translate('nickname', lang_code)}: {nickname}\n"
+            f"🚻 {translate('gender', lang_code)}: {gender}\n"
+            f"🎯 {translate('orientation', lang_code)}: {orientation}\n"
+            f"📚 {translate('interests', lang_code)}: {interests_str}\n"
         )
-        logging.info(f"Generated profile info: {profile_info}")
+        
         media_path = user.get('profile_photo')
         if media_path:
             try:
@@ -92,12 +94,11 @@ async def show_profile(message: types.Message, bot: Bot):
                     await bot.send_photo(message.chat.id, input_file, caption=profile_info)
             except Exception as e:
                 await message.answer(f"Ошибка при отправке медиа: {e}")
-                logging.error(f"Media send error: {e}")
         else:
             await message.answer(profile_info)
     else:
-        logging.error(f"User not found with ID: {message.from_user.id}")
         await message.answer("Пользователь не найден. Попробуйте зарегистрироваться заново.")
+
 
 
 

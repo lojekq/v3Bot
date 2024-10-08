@@ -307,3 +307,135 @@ msgstr "Вы заблокировали пользователя и заверш
 
 msgid "chat_finished"
 msgstr "Вы завершили чат."
+
+msgid "Music" 
+msgstr "Музыка"
+
+msgid "Cinema" 
+msgstr "Кино"
+
+msgid "Sport" 
+msgstr "Спорт"
+
+msgid "Technology" 
+msgstr "Технологии"
+
+msgid "Travel" 
+msgstr "Путешествия"
+
+msgid "Food" 
+msgstr "Еда"
+
+msgid "Fashion" 
+msgstr "Мода"
+
+msgid "Reading" 
+msgstr "Чтение"
+
+msgid "Programming" 
+msgstr "Программирование"
+
+msgid "Games" 
+msgstr "Игры"
+
+msgid "Photography" 
+msgstr "Фотография"
+
+msgid "Dancing" 
+msgstr "Танцы"
+
+msgid "Yoga" 
+msgstr "Йога"
+
+msgid "Meditation" 
+msgstr "Медитация"
+
+msgid "Cooking" 
+msgstr "Кулинария"
+
+msgid "Crossfit" 
+msgstr "Кроссфит"
+
+msgid "Art" 
+msgstr "Искусство"
+
+msgid "Drawing" 
+msgstr "Рисование"
+
+msgid "Playing Musi
+msgstr "Игра на музыкальных инструментах"
+
+msgid "Singing" 
+msgstr "Пение"
+
+msgid "Psychology" 
+msgstr "Психология"
+
+msgid "Science" 
+msgstr "Наука"
+
+msgid "Cars" 
+msgstr "Автомобили"
+
+msgid "Motorcycles" 
+msgstr "Мотоциклы"
+
+msgid "Extreme_Sports" 
+msgstr "Экстремальные виды спорта"
+
+msgid "Outdoor_Cooking" 
+msgstr "Готовка на открытом воздухе"
+
+msgid "Camping" 
+msgstr "Кемпинг"
+
+msgid "Movies" 
+msgstr "Фильмы"
+
+msgid "BDSM" 
+msgstr "БДСМ"
+
+msgid "Role_Playing" 
+msgstr "Ролевые игры"
+
+msgid "Foot_Fetish" 
+msgstr "Фут-фетиш"
+
+msgid "Anal_Sex" 
+msgstr "Анальный секс"
+
+msgid "Group_Sex" 
+msgstr "Групповой секс"
+
+msgid "Orgasm_Control" 
+msgstr "Контроль оргазма"
+
+msgid "Bondage" 
+msgstr "Бондаж"
+
+msgid "Exhibitionism" 
+msgstr "Эксгибиционизм "
+
+msgid "Erotic_Humiliation" 
+msgstr "Эротическое унижение"
+
+msgid "Dominance_and_Submission" 
+msgstr "Доминирование и подчинение"
+
+msgid "Urophilia" 
+msgstr "Урофилия"
+
+msgid "Sadism_Masochism" 
+msgstr "Садизм и мазохизм"
+
+msgid "Wax_play" 
+msgstr "Игра с воском"
+
+msgid "Quirofilia" 
+msgstr "Кирофилия"
+
+msgid "Electrostimulation" 
+msgstr "Электростимуляция"
+
+msgid "music_playing"
+msgstr "исполнять музыку"

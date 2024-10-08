@@ -114,10 +114,13 @@ async def update_user_gender(user_id, gender):
             await conn.commit()
 
 # Обновление ориентации пользователя
-async def update_user_orientation(user_id, orientation):
+async def update_user_orientation(user_id: int, orientation: str):
     async with db.acquire() as conn:
         async with conn.cursor() as cursor:
-            await cursor.execute("UPDATE users SET orientation = %s WHERE user_id = %s", (orientation, user_id))
+            await cursor.execute(
+                "UPDATE users SET orientation = %s WHERE user_id = %s",
+                (orientation, user_id)
+            )
             await conn.commit()
 
 # Функция для получения интересов пользователя из новой таблицы
@@ -249,9 +252,14 @@ async def add_finished_chat(user_id, partner_id):
 
 
 # Функция поиска совпадений с учетом завершенных чатов
-async def find_match(user_id, gender, orientation, interests, location, max_distance=10):
+async def find_match(user_id, gender, orientation, interests, location):
     async with db.acquire() as conn:
         async with conn.cursor(aiomysql.DictCursor) as cursor:
+            # Получаем данные пользователя, включая расстояние поиска
+            await cursor.execute("SELECT distance FROM users WHERE user_id = %s", (user_id,))
+            user_data = await cursor.fetchone()
+            max_distance = user_data.get('distance', 10)  # Используем расстояние пользователя или значение по умолчанию 10 км
+
             user_lat, user_lon = map(float, location.split(','))
 
             # Определение гендера для поиска
@@ -427,3 +435,38 @@ async def is_nickname_taken(nickname: str) -> bool:
             await cursor.execute("SELECT COUNT(*) FROM users WHERE username = %s", (nickname,))
             result = await cursor.fetchone()
             return result[0] > 0
+        
+async def update_search_radius(user_id: int, distance: float):
+    async with db.acquire() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute(
+                "UPDATE users SET distance = %s WHERE user_id = %s",
+                (distance, user_id)
+            )
+            await conn.commit()
+
+async def get_blocked_users(user_id: int):
+    async with db.acquire() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute(
+                """
+                SELECT blocked_users.blocked_id, users.username 
+                FROM blocked_users 
+                JOIN users ON blocked_users.blocked_id = users.user_id 
+                WHERE blocked_users.blocker_id = %s
+                """, 
+                (user_id,)
+            )
+            result = await cursor.fetchall()
+            return result  # Вернем результат как список кортежей
+ # Используем индекс 0 для доступа к первому элементу кортежа
+
+async def unblock_user(blocker_id: int, blocked_id: int):
+    async with db.acquire() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute(
+                "DELETE FROM blocked_users WHERE blocker_id = %s AND blocked_id = %s", 
+                (blocker_id, blocked_id)
+            )
+            await conn.commit()
+

@@ -309,3 +309,133 @@ msgstr "You have blocked the user and ended the chat."
 msgid "chat_finished"
 msgstr "You have finished the chat."
 
+
+    msgid "Music"
+    msgstr "Music"
+
+    msgid "Cinema"
+    msgstr "Cinema"
+
+    msgid "Sport"
+    msgstr "Sport"
+
+    msgid "Technology"
+    msgstr "Technology"
+
+    msgid "Travel"
+    msgstr "Travel"
+
+    msgid "Food"
+    msgstr "Food"
+
+    msgid "Fashion"
+    msgstr "Fashion"
+
+    msgid "Reading"
+    msgstr "Reading"
+
+    msgid "Programming"
+    msgstr "Programming"
+
+    msgid "Games"
+    msgstr "Games"
+
+    msgid "Photography"
+    msgstr "Photography"
+
+    msgid "Dancing"
+    msgstr "Dancing"
+
+    msgid "Yoga"
+    msgstr "Yoga"
+
+    msgid "Meditation"
+    msgstr "Meditation"
+
+    msgid "Cooking"
+    msgstr "Cooking"
+
+    msgid "Crossfit"
+    msgstr "Crossfit"
+
+    msgid "Art"
+    msgstr "Art"
+
+    msgid "Drawing"
+    msgstr "Drawing"
+
+    msgid "Playing Music"
+    msgstr "Playing Music"
+
+    msgid "Singing"
+    msgstr "Singing"
+
+    msgid "Psychology"
+    msgstr "Psychology"
+
+    msgid "Science"
+    msgstr "Science"
+
+    msgid "Cars"
+    msgstr "Cars"
+
+    msgid "Motorcycles"
+    msgstr "Motorcycles"
+
+    msgid "Extreme_Sports"
+    msgstr "Extreme Sports"
+
+    msgid "Outdoor_Cooking"
+    msgstr "Outdoor Cooking"
+
+    msgid "Camping"
+    msgstr "Camping"
+
+    msgid "Movies"
+    msgstr "Movies"
+
+    msgid "BDSM"
+    msgstr "BDSM"
+
+    msgid "Role_Playing"
+    msgstr "Role-Playing"
+
+    msgid "Foot_Fetish"
+    msgstr "Foot Fetish"
+
+    msgid "Anal_Sex"
+    msgstr "Anal Sex"
+
+    msgid "Group_Sex"
+    msgstr "Group Sex"
+
+    msgid "Orgasm_Control"
+    msgstr "Orgasm Control"
+
+    msgid "Bondage"
+    msgstr "Bondage"
+
+    msgid "Exhibitionism"
+    msgstr "Exhibitionism"
+
+    msgid "Erotic_Humiliation"
+    msgstr "Erotic Humiliation"
+
+    msgid "Dominance_and_Submission"
+    msgstr "Dominance and Submission"
+
+    msgid "Urophilia"
+    msgstr "Urophilia"
+
+    msgid "Sadism_Masochism"
+    msgstr "Sadism and Masochism"
+
+    msgid "Wax_play"
+    msgstr "Wax play"
+
+    msgid "Quirofilia"
+    msgstr "Quirofilia"
+
+    msgid "Electrostimulation"
+    msgstr "Electrostimulation"
+
